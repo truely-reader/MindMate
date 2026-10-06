@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Support | MindMate</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- MindMate CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        /* =====================================================
+           AI SUPPORT PAGE
+        ===================================================== */
+
+        .ai-support-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 25px 30px 35px;
+        }
+
+
+        /* Page Header */
+
+        .ai-page-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .ai-page-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: #eee7fc;
+            color: #7652d4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .ai-page-header h1 {
+            margin: 0;
+            color: #30243a;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .ai-page-header p {
+            margin: 4px 0 0;
+            color: #958b9d;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+
+        /* Main Chat Layout */
+
+        .ai-support-layout {
+            display: grid;
+            grid-template-columns: 1fr 270px;
+            gap: 20px;
+            align-items: start;
+        }
+
+
+        /* Chat Card */
+
+        .ai-chat-card {
+            background: #ffffff;
+            border: 1px solid #ebe7f2;
+            border-radius: 18px;
+            box-shadow: 0 7px 25px rgba(31, 3, 68, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 580px;
+        }
+
+
+        /* Chat Header */
+
+        .ai-chat-header {
+            padding: 17px 20px;
+            border-bottom: 1px solid #f0edf5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ai-chat-profile {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .ai-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #1f0344;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .ai-chat-profile h3 {
+            margin: 0;
+            color: #3c3045;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .ai-chat-profile span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 3px;
+            color: #8e8497;
+            font-size: 9px;
+        }
+
+        .ai-online-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #69bd82;
+        }
+
+
+        /* Chat Area */
+
+        .ai-chat-area {
+            flex: 1;
+            padding: 22px;
+            background: #fcfbfe;
+            overflow-y: auto;
+            min-height: 390px;
+            max-height: 480px;
+        }
+
+
+        /* Welcome Message */
+
+        .ai-welcome {
+            text-align: center;
+            max-width: 400px;
+            margin: 35px auto 28px;
+        }
+
+        .ai-welcome-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 13px;
+            border-radius: 17px;
+            background: #eee7fc;
+            color: #7652d4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+        }
+
+        .ai-welcome h2 {
+            margin: 0 0 7px;
+            color: #403347;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .ai-welcome p {
+            margin: 0;
+            color: #9b92a3;
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+
+        /* Message */
+
+        .ai-message-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .ai-message-row.user {
+            justify-content: flex-end;
+        }
+
+        .ai-message-row.ai {
+            justify-content: flex-start;
+        }
+
+        .ai-message {
+            max-width: 75%;
+            padding: 11px 14px;
+            border-radius: 14px;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .ai-message.ai {
+            background: #eee7fc;
+            color: #4b3d55;
+            border-bottom-left-radius: 4px;
+        }
+
+        .ai-message.user {
+            background: #1f0344;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+
+
+        /* Input Area */
+
+        .ai-input-area {
+            padding: 15px;
+            border-top: 1px solid #f0edf5;
+            background: #ffffff;
+        }
+
+        .ai-input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 9px;
+            background: #f7f5fa;
+            border: 1px solid #ebe7f2;
+            border-radius: 13px;
+            padding: 7px 7px 7px 13px;
+        }
+
+        .ai-message-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            resize: none;
+            background: transparent;
+            color: #493c50;
+            font-family: 'Poppins', sans-serif;
+            font-size: 10px;
+            min-height: 37px;
+            max-height: 100px;
+            padding: 9px 0;
+        }
+
+        .ai-message-input::placeholder {
+            color: #aaa2b2;
+        }
+
+        .ai-send-btn {
+            width: 37px;
+            height: 37px;
+            flex-shrink: 0;
+            border: none;
+            border-radius: 10px;
+            background: #7652d4;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .ai-send-btn:hover {
+            background: #6540c2;
+            transform: translateY(-1px);
+        }
+
+        .ai-input-note {
+            margin: 7px 2px 0;
+            color: #aaa1af;
+            font-size: 8px;
+        }
+
+
+        /* Quick Suggestions */
+
+        .ai-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 15px;
+        }
+
+        .ai-suggestion-btn {
+            border: 1px solid #e5def1;
+            background: #ffffff;
+            color: #7254ae;
+            border-radius: 20px;
+            padding: 7px 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 8px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .ai-suggestion-btn:hover {
+            background: #eee7fc;
+            border-color: #d9c9f4;
+        }
+
+
+        /* =====================================================
+           SIDE INFORMATION CARD
+        ===================================================== */
+
+        .ai-info-card {
+            background: #ffffff;
+            border: 1px solid #ebe7f2;
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 7px 25px rgba(31, 3, 68, 0.04);
+        }
+
+        .ai-info-card h3 {
+            margin: 0 0 13px;
+            color: #403347;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .ai-info-item {
+            display: flex;
+            gap: 10px;
+            padding: 11px 0;
+            border-bottom: 1px solid #f1eef5;
+        }
+
+        .ai-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .ai-info-icon {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            border-radius: 9px;
+            background: #f1edfa;
+            color: #7652d4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        .ai-info-item h4 {
+            margin: 0 0 3px;
+            color: #514355;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .ai-info-item p {
+            margin: 0;
+            color: #9a909f;
+            font-size: 8px;
+            line-height: 1.5;
+        }
+
+
+        /* Support Note */
+
+        .ai-support-note {
+            margin-top: 15px;
+            padding: 13px;
+            border-radius: 13px;
+            background: #fff8f4;
+            border: 1px solid #f5e5dc;
+        }
+
+        .ai-support-note i {
+            color: #d38a62;
+            margin-right: 5px;
+        }
+
+        .ai-support-note p {
+            display: inline;
+            color: #967c70;
+            font-size: 8px;
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           TYPING INDICATOR
+        ===================================================== */
+
+        .ai-typing {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            width: fit-content;
+            padding: 10px 13px;
+            background: #eee7fc;
+            border-radius: 13px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .ai-typing.active {
+            display: flex;
+        }
+
+        .ai-typing span {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #7652d4;
+            animation: typing 1.2s infinite ease-in-out;
+        }
+
+        .ai-typing span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .ai-typing span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.45;
+            }
+
+            30% {
+                transform: translateY(-4px);
+                opacity: 1;
+            }
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1000px) {
+
+            .ai-support-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-info-card {
+                display: none;
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .ai-support-content {
+                padding: 20px 15px 30px;
+            }
+
+            .ai-page-header h1 {
+                font-size: 18px;
+            }
+
+            .ai-chat-card {
+                min-height: 540px;
+            }
+
+            .ai-chat-area {
+                padding: 15px;
+            }
+
+            .ai-message {
+                max-width: 88%;
+            }
+
+            .ai-suggestions {
+                gap: 5px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body class="dashboard-page ai-support-page">
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="mindmate-sidebar" id="mindmateSidebar">
+
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+            <i class="fa-solid fa-brain"></i>
+        </div>
+
+        <div>
+            <h2>MindMate</h2>
+            <span>Better Mind, Brighter You</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('mood') }}" class="sidebar-link">
+            <i class="fa-solid fa-face-smile"></i>
+            <span>Track Mood</span>
+        </a>
+
+        <a href="{{ url_for('journal') }}" class="sidebar-link">
+            <i class="fa-solid fa-book"></i>
+            <span>Journal</span>
+        </a>
+
+        <a href="{{ url_for('chat') }}" class="sidebar-link">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Support</span>
+        </a>
+
+        <a href="{{ url_for('resources') }}" class="sidebar-link">
+            <i class="fa-solid fa-heart"></i>
+            <span>Resources</span>
+        </a>
+
+        <a href="{{ url_for('counselor') }}" class="sidebar-link">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Counselor</span>
+        </a>
+
+        <a href="{{ url_for('sos') }}" class="sidebar-link sos-link">
+            <i class="fa-solid fa-life-ring"></i>
+            <span>SOS Support</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+</aside>
+
+
+<!-- MOBILE OVERLAY -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+></div>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="dashboard-main">
+
+
+    <!-- =================================================
+         TOPBAR
+    ================================================= -->
+
+    <header class="dashboard-topbar">
+
+        <div class="topbar-left">
+
+            <!-- Mobile Menu -->
+
+            <button
+                class="sidebar-toggle"
+                id="sidebarToggle"
+                type="button"
+                aria-label="Open menu"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+
+            <!-- Back -->
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="page-back-btn"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+
+        </div>
+
+
+        <!-- Profile -->
+
+        <div class="topbar-right">
+
+            <div class="topbar-avatar">
+                {{ student_name[0] | upper if student_name else 'U' }}
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =================================================
+         CONTENT
+    ================================================= -->
+
+    <div class="ai-support-content">
+
+
+        <!-- PAGE HEADER -->
+
+        <section class="ai-page-header">
+
+            <div class="ai-page-icon">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+
+            <div>
+
+                <h1>AI Support</h1>
+
+                <p>
+                    A safe space to talk, reflect and get supportive guidance.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHAT + INFO
+        ================================================= -->
+
+        <div class="ai-support-layout">
+
+
+            <!-- CHAT CARD -->
+
+            <section class="ai-chat-card">
+
+
+                <!-- CHAT HEADER -->
+
+                <div class="ai-chat-header">
+
+                    <div class="ai-chat-profile">
+
+                        <div class="ai-avatar">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>MindMate AI</h3>
+
+                            <span>
+                                <span class="ai-online-dot"></span>
+                                Support assistant
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CHAT AREA -->
+
+                <div
+                    class="ai-chat-area"
+                    id="aiChatArea"
+                >
+
+
+                    <!-- WELCOME -->
+
+                    <div
+                        class="ai-welcome"
+                        id="aiWelcome"
+                    >
+
+                        <div class="ai-welcome-icon">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+
+                        <h2>Hi, {{ student_name if student_name else 'there' }} 👋</h2>
+
+                        <p>
+                            I'm here to listen and support you.
+                            You can talk about your studies, stress,
+                            feelings or anything that's on your mind.
+                        </p>
+
+
+                        <!-- QUICK SUGGESTIONS -->
+
+                        <div class="ai-suggestions">
+
+                            <button
+                                type="button"
+                                class="ai-suggestion-btn"
+                                onclick="useSuggestion('I am feeling stressed today.')"
+                            >
+                                I'm feeling stressed
+                            </button>
+
+                            <button
+                                type="button"
+                                class="ai-suggestion-btn"
+                                onclick="useSuggestion('I am having difficulty focusing on my studies.')"
+                            >
+                                Study pressure
+                            </button>
+
+                            <button
+                                type="button"
+                                class="ai-suggestion-btn"
+                                onclick="useSuggestion('I just want to talk about how I am feeling.')"
+                            >
+                                I want to talk
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DEMO AI MESSAGE -->
+
+                    <div class="ai-message-row ai">
+
+                        <div class="ai-message ai">
+
+                            <strong>MindMate AI</strong><br>
+
+                            You can share what's on your mind.
+                            I'll listen and help you think through it.
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TYPING INDICATOR -->
+
+                    <div
+                        class="ai-message-row ai"
+                        id="typingRow"
+                    >
+
+                        <div class="ai-typing" id="typingIndicator">
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- INPUT -->
+
+                <div class="ai-input-area">
+
+                    <div class="ai-input-wrapper">
+
+                        <textarea
+                            id="aiMessageInput"
+                            class="ai-message-input"
+                            rows="1"
+                            maxlength="2000"
+                            placeholder="Type what's on your mind..."
+                            aria-label="Message"
+                        ></textarea>
+
+
+                        <button
+                            type="button"
+                            class="ai-send-btn"
+                            id="aiSendBtn"
+                            aria-label="Send message"
+                        >
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+
+                    </div>
+
+
+                    <div class="ai-input-note">
+
+                        <i class="fa-solid fa-lock"></i>
+
+                        Your conversation is private to your MindMate account.
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 INFORMATION CARD
+            ================================================= -->
+
+            <aside>
+
+                <div class="ai-info-card">
+
+                    <h3>How MindMate AI can help</h3>
+
+
+                    <div class="ai-info-item">
+
+                        <div class="ai-info-icon">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+
+                        <div>
+
+                            <h4>Talk & Reflect</h4>
+
+                            <p>
+                                Share your thoughts and feelings
+                                in a comfortable space.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-info-item">
+
+                        <div class="ai-info-icon">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+
+                        <div>
+
+                            <h4>Supportive Suggestions</h4>
+
+                            <p>
+                                Get simple ideas for handling
+                                everyday student stress.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-info-item">
+
+                        <div class="ai-info-icon">
+                            <i class="fa-solid fa-leaf"></i>
+                        </div>
+
+                        <div>
+
+                            <h4>MindMate Resources</h4>
+
+                            <p>
+                                Discover breathing, relaxation
+                                and mindfulness activities.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-info-item">
+
+                        <div class="ai-info-icon">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+
+                        <div>
+
+                            <h4>Human Support</h4>
+
+                            <p>
+                                When needed, MindMate can guide
+                                you toward counselor support.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SUPPORT NOTE -->
+
+                <div class="ai-support-note">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <p>
+                        MindMate AI provides supportive guidance,
+                        not professional medical or counseling care.
+                    </p>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+    /* =====================================================
+       SIDEBAR
+    ===================================================== */
+
+    const sidebarToggle =
+        document.getElementById("sidebarToggle");
+
+    const sidebar =
+        document.getElementById("mindmateSidebar");
+
+    const overlay =
+        document.getElementById("sidebarOverlay");
+
+
+    if (sidebarToggle) {
+
+        sidebarToggle.addEventListener("click", function () {
+
+            sidebar.classList.toggle("sidebar-open");
+
+            overlay.classList.toggle("overlay-active");
+
+        });
+
+    }
+
+
+    if (overlay) {
+
+        overlay.addEventListener("click", function () {
+
+            sidebar.classList.remove("sidebar-open");
+
+            overlay.classList.remove("overlay-active");
+
+        });
+
+    }
+
+
+    /* =====================================================
+       COMING SOON
+    ===================================================== */
+
+    function comingSoon(event, featureName) {
+
+        event.preventDefault();
+
+        alert(featureName + " will be available soon.");
+
+    }
+
+
+    /* =====================================================
+       AI CHAT UI — TEMPORARY FRONTEND DEMO
+       
+       Gemini backend will be connected in the next step.
+    ===================================================== */
+
+    const input =
+        document.getElementById("aiMessageInput");
+
+    const sendBtn =
+        document.getElementById("aiSendBtn");
+
+    const chatArea =
+        document.getElementById("aiChatArea");
+
+    const welcome =
+        document.getElementById("aiWelcome");
+
+    const typingIndicator =
+        document.getElementById("typingIndicator");
+
+
+    /* Use suggestion */
+
+    function useSuggestion(message) {
+
+        input.value = message;
+
+        input.focus();
+
+    }
+
+
+    /* Add message */
+
+    function addMessage(message, type) {
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "ai-message-row " + type;
+
+
+        const bubble =
+            document.createElement("div");
+
+        bubble.className =
+            "ai-message " + type;
+
+
+        bubble.textContent =
+            message;
+
+
+        row.appendChild(bubble);
+
+        chatArea.appendChild(row);
+
+
+        chatArea.scrollTop =
+            chatArea.scrollHeight;
+
+    }
+
+
+    /* Send message — temporary */
+
+    function sendMessage() {
+
+        const message =
+            input.value.trim();
+
+
+        if (!message) {
+            return;
+        }
+
+
+        /* Hide welcome */
+
+        if (welcome) {
+            welcome.style.display = "none";
+        }
+
+
+        /* Add user message */
+
+        addMessage(message, "user");
+
+
+        /* Clear input */
+
+        input.value = "";
+
+
+        /* Temporary typing effect */
+
+        typingIndicator.classList.add("active");
+
+
+        chatArea.scrollTop =
+            chatArea.scrollHeight;
+
+
+        setTimeout(function () {
+
+            typingIndicator.classList.remove("active");
+
+
+            addMessage(
+                "Thanks for sharing. In the next step, MindMate AI will be connected to Gemini so I can respond to your message.",
+                "ai"
+            );
+
+        }, 900);
+
+    }
+
+
+    /* Send button */
+
+    if (sendBtn) {
+
+        sendBtn.addEventListener(
+            "click",
+            sendMessage
+        );
+
+    }
+
+
+    /* Enter = Send
+       Shift + Enter = New line */
+
+    if (input) {
+
+        input.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    sendMessage();
+
+                }
+
+            }
+        );
+
+    }
+
+</script>
+
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+></script>
+
+</body>
+
+</html>

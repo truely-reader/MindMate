@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Resources | MindMate</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="dashboard-page resources-page">
+
+   <!-- ================= SIDEBAR ================= -->
+
+<aside class="mindmate-sidebar" id="mindmateSidebar">
+
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+            <i class="fa-solid fa-brain"></i>
+        </div>
+
+        <div>
+            <h2>MindMate</h2>
+            <span>Better Mind, Brighter You</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('mood') }}" class="sidebar-link">
+            <i class="fa-solid fa-face-smile"></i>
+            <span>Track Mood</span>
+        </a>
+
+        <a href="{{ url_for('journal') }}" class="sidebar-link">
+            <i class="fa-solid fa-book"></i>
+            <span>Journal</span>
+        </a>
+
+        <a href="{{ url_for('chat') }}" class="sidebar-link">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Support</span>
+        </a>
+
+        <a href="{{ url_for('resources') }}" class="sidebar-link">
+            <i class="fa-solid fa-heart"></i>
+            <span>Resources</span>
+        </a>
+
+        <a href="{{ url_for('counselor') }}" class="sidebar-link">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Counselor</span>
+        </a>
+
+        <a href="{{ url_for('sos') }}" class="sidebar-link sos-link">
+            <i class="fa-solid fa-life-ring"></i>
+            <span>SOS Support</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+</aside>
+
+<!-- ================= MOBILE OVERLAY ================= -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+    onclick="closeSidebar()"
+></div>
+    <!-- ================= MOBILE OVERLAY ================= -->
+
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        onclick="closeSidebar()"
+    ></div>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="dashboard-main resources-main">
+
+        <!-- ================= TOPBAR ================= -->
+
+        <header class="dashboard-topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    class="sidebar-toggle"
+                    id="sidebarToggle"
+                    onclick="toggleSidebar()"
+                    type="button"
+                    aria-label="Open menu"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <button
+                    class="back-button"
+                    onclick="goBack()"
+                    type="button"
+                >
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back</span>
+                </button>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="profile-mini">
+
+                    <div class="profile-avatar">
+                        {{ session.get('student_name', 'Student')[0] | upper }}
+                    </div>
+
+                    <span>
+                        {{ session.get('student_name', 'Student') }}
+                    </span>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <div class="resources-content">
+
+            <!-- PAGE HEADER -->
+
+            <div class="resources-page-header">
+
+                <div class="resources-page-icon">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+
+                <div>
+                    <h1>Resources</h1>
+
+                    <p>
+                        Small activities to help you relax, pause and recharge.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- FLASH MESSAGES -->
+
+            <div class="resources-flash-area">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+
+                    {% if messages %}
+
+                        {% for category, message in messages %}
+
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                {% endwith %}
+
+            </div>
+
+
+            <!-- ================= RESOURCE CARDS ================= -->
+
+            <div class="resources-grid">
+
+                {% if resources %}
+
+                    {% for resource in resources %}
+
+                    <div class="resource-card">
+
+                        <div class="resource-card-top">
+
+                            <div
+                                class="resource-icon
+                                {% if resource.category == 'Breathing' %}
+                                    breathing-icon
+                                {% elif resource.category == 'Relaxation' %}
+                                    relaxation-icon
+                                {% elif resource.category == 'Stress Relief' %}
+                                    stress-icon
+                                {% elif resource.category == 'Motivation' %}
+                                    motivation-icon
+                                {% elif resource.category == 'Mindfulness' %}
+                                    mindfulness-icon
+                                {% else %}
+                                    default-resource-icon
+                                {% endif %}
+                                "
+                            >
+
+                                {% if resource.category == 'Breathing' %}
+
+                                    <i class="fa-solid fa-wind"></i>
+
+                                {% elif resource.category == 'Relaxation' %}
+
+                                    <i class="fa-solid fa-music"></i>
+
+                                {% elif resource.category == 'Stress Relief' %}
+
+                                    <i class="fa-solid fa-mug-hot"></i>
+
+                                {% elif resource.category == 'Motivation' %}
+
+                                    <i class="fa-solid fa-sun"></i>
+
+                                {% elif resource.category == 'Mindfulness' %}
+
+                                    <i class="fa-solid fa-seedling"></i>
+
+                                {% else %}
+
+                                    <i class="fa-solid fa-heart"></i>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <span class="resource-category">
+                                {{ resource.category }}
+                            </span>
+
+                        </div>
+
+
+                        <h2>
+                            {{ resource.title }}
+                        </h2>
+
+
+                        <p>
+                            {{ resource.description }}
+                        </p>
+
+
+                        <!-- TRY NOW -->
+
+                        <button
+                            type="button"
+                            class="resource-action"
+                            data-title="{{ resource.title }}"
+                            data-category="{{ resource.category }}"
+                            onclick="openResourceActivity(this.dataset.title, this.dataset.category)"
+                        >
+                            Try Now
+
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                    {% endfor %}
+
+
+                {% else %}
+
+                    <!-- EMPTY STATE -->
+
+                    <div class="resources-empty">
+
+                        <div class="resources-empty-icon">
+                            <i class="fa-solid fa-leaf"></i>
+                        </div>
+
+                        <h2>
+                            No resources available
+                        </h2>
+
+                        <p>
+                            Helpful resources will appear here soon.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ================= SUPPORT NOTE ================= -->
+
+            <div class="resources-support-note">
+
+                <i class="fa-solid fa-circle-info"></i>
+
+                <span>
+                    Take a small pause whenever you need it.
+                    These activities are designed for simple everyday support.
+                </span>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- ================================================= -->
+    <!-- RESOURCE ACTIVITY MODAL -->
+    <!-- ================================================= -->
+
+    <div
+        class="modal fade"
+        id="resourceModal"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content resource-modal-content">
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <h5
+                            class="modal-title"
+                            id="resourceModalTitle"
+                        >
+                            Resource Activity
+                        </h5>
+
+                        <p
+                            class="resource-modal-subtitle"
+                            id="resourceModalSubtitle"
+                        >
+                            Take a small pause for yourself.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                        onclick="stopActivity()"
+                    ></button>
+
+                </div>
+
+
+                <div
+                    class="modal-body"
+                    id="resourceActivityBody"
+                >
+                    <!-- Activity inserted by JavaScript -->
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- BOOTSTRAP JS -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+    <script>
+
+        let activityInterval = null;
+        let breathingPhase = "in";
+        let breathingRunning = false;
+
+
+        /* ================= SIDEBAR ================= */
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById("mindmateSidebar");
+
+            const overlay =
+                document.getElementById("sidebarOverlay");
+
+            if (sidebar && overlay) {
+
+                sidebar.classList.toggle("sidebar-open");
+
+                overlay.classList.toggle("overlay-active");
+
+            }
+        }
+
+
+        function closeSidebar() {
+
+            const sidebar =
+                document.getElementById("mindmateSidebar");
+
+            const overlay =
+                document.getElementById("sidebarOverlay");
+
+            if (sidebar && overlay) {
+
+                sidebar.classList.remove("sidebar-open");
+
+                overlay.classList.remove("overlay-active");
+
+            }
+        }
+
+
+        /* Close mobile sidebar after clicking a link */
+
+        document
+            .querySelectorAll(".sidebar-link")
+            .forEach(function(link) {
+
+                link.addEventListener("click", function() {
+
+                    if (window.innerWidth <= 900) {
+                        closeSidebar();
+                    }
+
+                });
+
+            });
+
+
+        /* ================= BACK ================= */
+
+        function goBack() {
+
+            if (window.history.length > 1) {
+
+                window.history.back();
+
+            } else {
+
+                window.location.href =
+                    "{{ url_for('dashboard') }}";
+
+            }
+
+        }
+
+
+        /* ================= COMING SOON ================= */
+
+        function comingSoon(event, pageName) {
+
+            event.preventDefault();
+
+            alert(
+                pageName +
+                " will be available soon."
+            );
+
+        }
+
+
+        /* ================================================= */
+        /* OPEN RESOURCE */
+        /* ================================================= */
+
+        function openResourceActivity(title, category) {
+
+            stopActivity();
+
+            document.getElementById(
+                "resourceModalTitle"
+            ).innerText = title;
+
+            const body =
+                document.getElementById(
+                    "resourceActivityBody"
+                );
+
+            let html = "";
+
+
+            /* ---------- DEEP BREATHING ---------- */
+
+            if (title === "Deep Breathing Exercise") {
+
+                html = `
+
+                    <div class="activity-center">
+
+                        <div
+                            class="breathing-circle"
+                            id="breathingCircle"
+                        >
+                            <span id="breathingText">
+                                Ready
+                            </span>
+                        </div>
+
+                        <p
+                            class="activity-instruction"
+                            id="breathingInstruction"
+                        >
+                            Press Start and follow the circle.
+                        </p>
+
+                        <div class="activity-buttons">
+
+                            <button
+                                class="activity-btn primary"
+                                onclick="startBreathing()"
+                            >
+                                <i class="fa-solid fa-play"></i>
+                                Start
+                            </button>
+
+                            <button
+                                class="activity-btn secondary"
+                                onclick="stopActivity()"
+                            >
+                                <i class="fa-solid fa-pause"></i>
+                                Pause
+                            </button>
+
+                            <button
+                                class="activity-btn light"
+                                onclick="resetBreathing()"
+                            >
+                                Reset
+                            </button>
+
+                        </div>
+
+                        <div class="breathing-info">
+                            Breathe in for 4 seconds •
+                            Breathe out for 4 seconds
+                        </div>
+
+                    </div>
+
+                `;
+            }
+
+
+            /* ---------- MINDFUL BREATHING ---------- */
+
+            else if (title === "Mindful Breathing") {
+
+                html = `
+
+                    <div class="activity-center">
+
+                        <div
+                            class="simple-breath-circle"
+                            id="mindfulCircle"
+                        >
+                            <i class="fa-solid fa-wind"></i>
+                        </div>
+
+                        <h4 id="mindfulText">
+                            Ready to begin
+                        </h4>
+
+                        <p class="activity-instruction">
+                            Gently focus your attention
+                            on your breathing.
+                        </p>
+
+                        <button
+                            class="activity-btn primary"
+                            onclick="startMindfulBreathing()"
+                        >
+                            <i class="fa-solid fa-play"></i>
+                            Start
+                        </button>
+
+                    </div>
+
+                `;
+            }
+
+
+            /* ---------- RELAXING MUSIC ---------- */
+
+            else if (title === "Relaxing Music") {
+
+                html = `
+
+                    <div class="activity-center">
+
+                        <div class="music-icon">
+                            <i class="fa-solid fa-headphones"></i>
+                        </div>
+
+                        <h4>
+                            Quiet Relaxation
+                        </h4>
+
+                        <p class="activity-instruction">
+                            Put on your preferred calm
+                            instrumental music, sit comfortably
+                            and take a quiet moment.
+                        </p>
+
+                        <div
+                            class="timer-display"
+                            id="relaxTimer"
+                        >
+                            01:00
+                        </div>
+
+                        <div class="activity-buttons">
+
+                            <button
+                                class="activity-btn primary"
+                                onclick="startTimer('relaxTimer', 60)"
+                            >
+                                <i class="fa-solid fa-play"></i>
+                                Start
+                            </button>
+
+                            <button
+                                class="activity-btn light"
+                                onclick="resetTimer('relaxTimer', 60)"
+                            >
+                                Reset
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `;
+            }
+
+
+            /* ---------- SHORT BREAK ---------- */
+
+            else if (title === "Take a Short Break") {
+
+                html = `
+
+                    <div class="activity-center">
+
+                        <div class="break-icon">
+                            <i class="fa-solid fa-mug-hot"></i>
+                        </div>
+
+                        <h4>
+                            Take a 60-second pause
+                        </h4>
+
+                        <p class="activity-instruction">
+                            Step away from your screen
+                            and give your mind a small break.
+                        </p>
+
+                        <div
+                            class="timer-display"
+                            id="breakTimer"
+                        >
+                            01:00
+                        </div>
+
+                        <button
+                            class="activity-btn primary"
+                            onclick="startTimer('breakTimer', 60)"
+                        >
+                            <i class="fa-solid fa-play"></i>
+                            Start Break
+                        </button>
+
+                    </div>
+
+                `;
+            }
+
+
+            /* ---------- POSITIVE SELF TALK ---------- */
+
+            else if (title === "Positive Self-Talk") {
+
+                html = `
+
+                    <div class="activity-center">
+
+                        <div class="prompt-icon">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+
+                        <h4>
+                            Pause and remind yourself:
+                        </h4>
+
+                        <div
+                            class="positive-prompt"
+                            id="positivePrompt"
+                        >
+                            You are allowed to take
+                            things one step at a time. 💜
+                        </div>
+
+                        <button
+                            class="activity-btn primary"
+                            onclick="newPositivePrompt()"
+                        >
+                            <i class="fa-solid fa-shuffle"></i>
+                            Another Reminder
+                        </button>
+
+                    </div>
+
+                `;
+            }
+
+
+            /* ---------- STUDY BREAK ---------- */
+
+            else if (title === "Study Break Activity") {
+
+                html = `
+
+                    <div class="activity-center">
+
+                        <div class="break-icon">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+
+                        <h4>
+                            One-minute study break
+                        </h4>
+
+                        <p class="activity-instruction">
+                            Look away from your screen,
+                            relax your shoulders, and take
+                            a quiet pause.
+                        </p>
+
+                        <div
+                            class="timer-display"
+                            id="studyTimer"
+                        >
+                            01:00
+                        </div>
+
+                        <button
+                            class="activity-btn primary"
+                            onclick="startTimer('studyTimer', 60)"
+                        >
+                            <i class="fa-solid fa-play"></i>
+                            Start
+                        </button>
+
+                    </div>
+
+                `;
+            }
+
+
+            /* ---------- MINDFULNESS ---------- */
+
+            else if (title === "Mindfulness Moment") {
+
+                html = `
+
+                    <div class="activity-center">
+
+                        <div class="mindfulness-icon-large">
+                            <i class="fa-solid fa-seedling"></i>
+                        </div>
+
+                        <h4>
+                            Notice the moment
+                        </h4>
+
+                        <div class="mindfulness-list">
+
+                            <div>
+                                <i class="fa-solid fa-volume-high"></i>
+                                Notice one sound around you.
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-eye"></i>
+                                Notice one thing you can see.
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-heart"></i>
+                                Notice how you feel right now.
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="timer-display"
+                            id="mindfulnessTimer"
+                        >
+                            00:30
+                        </div>
+
+                        <button
+                            class="activity-btn primary"
+                            onclick="startTimer('mindfulnessTimer', 30)"
+                        >
+                            <i class="fa-solid fa-play"></i>
+                            Start
+                        </button>
+
+                    </div>
+
+                `;
+            }
+
+
+            /* ---------- DAILY MOTIVATION ---------- */
+
+            else if (title === "Daily Motivation") {
+
+                html = `
+
+                    <div class="activity-center">
+
+                        <div class="motivation-large-icon">
+                            <i class="fa-solid fa-sun"></i>
+                        </div>
+
+                        <div
+                            class="motivation-message"
+                            id="motivationMessage"
+                        >
+                            Small steps still move
+                            you forward. 🌱
+                        </div>
+
+                        <button
+                            class="activity-btn primary"
+                            onclick="newMotivation()"
+                        >
+                            <i class="fa-solid fa-shuffle"></i>
+                            New Message
+                        </button>
+
+                    </div>
+
+                `;
+            }
+
+
+            /* ---------- DEFAULT RESOURCE ---------- */
+
+            else {
+
+                html = `
+
+                    <div class="activity-center">
+
+                        <div class="prompt-icon">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+
+                        <h4>
+                            Take a small pause
+                        </h4>
+
+                        <p class="activity-instruction">
+                            Spend a few quiet moments
+                            taking care of yourself.
+                        </p>
+
+                    </div>
+
+                `;
+            }
+
+
+            body.innerHTML = html;
+
+
+            const modalElement =
+                document.getElementById("resourceModal");
+
+            const modal =
+                bootstrap.Modal.getOrCreateInstance(
+                    modalElement
+                );
+
+            modal.show();
+
+        }
+
+
+        /* ================================================= */
+        /* DEEP BREATHING */
+        /* ================================================= */
+
+        function startBreathing() {
+
+            if (breathingRunning) return;
+
+            breathingRunning = true;
+
+            runBreathingPhase();
+
+            activityInterval = setInterval(function() {
+
+                breathingPhase =
+                    breathingPhase === "in"
+                        ? "out"
+                        : "in";
+
+                runBreathingPhase();
+
+            }, 4000);
+
+        }
+
+
+        function runBreathingPhase() {
+
+            const circle =
+                document.getElementById(
+                    "breathingCircle"
+                );
+
+            const text =
+                document.getElementById(
+                    "breathingText"
+                );
+
+            const instruction =
+                document.getElementById(
+                    "breathingInstruction"
+                );
+
+            if (!circle || !text) return;
+
+
+            if (breathingPhase === "in") {
+
+                circle.classList.remove(
+                    "breathing-out"
+                );
+
+                circle.classList.add(
+                    "breathing-in"
+                );
+
+                text.innerText =
+                    "Breathe In";
+
+                if (instruction) {
+
+                    instruction.innerText =
+                        "Slowly breathe in...";
+
+                }
+
+            } else {
+
+                circle.classList.remove(
+                    "breathing-in"
+                );
+
+                circle.classList.add(
+                    "breathing-out"
+                );
+
+                text.innerText =
+                    "Breathe Out";
+
+                if (instruction) {
+
+                    instruction.innerText =
+                        "Slowly breathe out...";
+
+                }
+
+            }
+
+        }
+
+
+        function resetBreathing() {
+
+            stopActivity();
+
+            breathingPhase = "in";
+
+            const circle =
+                document.getElementById(
+                    "breathingCircle"
+                );
+
+            const text =
+                document.getElementById(
+                    "breathingText"
+                );
+
+            const instruction =
+                document.getElementById(
+                    "breathingInstruction"
+                );
+
+
+            if (circle) {
+
+                circle.classList.remove(
+                    "breathing-in",
+                    "breathing-out"
+                );
+
+            }
+
+
+            if (text) {
+
+                text.innerText = "Ready";
+
+            }
+
+
+            if (instruction) {
+
+                instruction.innerText =
+                    "Press Start and follow the circle.";
+
+            }
+
+        }
+
+
+        /* ================================================= */
+        /* STOP ACTIVITY */
+        /* ================================================= */
+
+        function stopActivity() {
+
+            if (activityInterval) {
+
+                clearInterval(activityInterval);
+
+                activityInterval = null;
+
+            }
+
+            breathingRunning = false;
+
+        }
+
+
+        /* ================================================= */
+        /* MINDFUL BREATHING */
+        /* ================================================= */
+
+        function startMindfulBreathing() {
+
+            stopActivity();
+
+            const circle =
+                document.getElementById(
+                    "mindfulCircle"
+                );
+
+            const text =
+                document.getElementById(
+                    "mindfulText"
+                );
+
+            if (!circle || !text) return;
+
+
+            let phase = true;
+
+            text.innerText =
+                "Breathe In";
+
+            circle.classList.add(
+                "breathing-in"
+            );
+
+
+            activityInterval =
+                setInterval(function() {
+
+                    phase = !phase;
+
+
+                    if (phase) {
+
+                        text.innerText =
+                            "Breathe In";
+
+                        circle.classList.remove(
+                            "breathing-out"
+                        );
+
+                        circle.classList.add(
+                            "breathing-in"
+                        );
+
+                    } else {
+
+                        text.innerText =
+                            "Breathe Out";
+
+                        circle.classList.remove(
+                            "breathing-in"
+                        );
+
+                        circle.classList.add(
+                            "breathing-out"
+                        );
+
+                    }
+
+                }, 4000);
+
+        }
+
+
+        /* ================================================= */
+        /* TIMERS */
+        /* ================================================= */
+
+        function startTimer(elementId, seconds) {
+
+            stopActivity();
+
+            let remaining = seconds;
+
+            const element =
+                document.getElementById(
+                    elementId
+                );
+
+            if (!element) return;
+
+
+            function updateTimer() {
+
+                const minutes =
+                    Math.floor(
+                        remaining / 60
+                    );
+
+                const secs =
+                    remaining % 60;
+
+
+                element.innerText =
+                    String(minutes).padStart(2, "0")
+                    + ":"
+                    + String(secs).padStart(2, "0");
+
+
+                if (remaining <= 0) {
+
+                    clearInterval(
+                        activityInterval
+                    );
+
+                    activityInterval = null;
+
+                    return;
+
+                }
+
+
+                remaining--;
+
+            }
+
+
+            updateTimer();
+
+
+            activityInterval =
+                setInterval(
+                    updateTimer,
+                    1000
+                );
+
+        }
+
+
+        function resetTimer(elementId, seconds) {
+
+            stopActivity();
+
+            const element =
+                document.getElementById(
+                    elementId
+                );
+
+            if (!element) return;
+
+
+            const minutes =
+                Math.floor(
+                    seconds / 60
+                );
+
+            const secs =
+                seconds % 60;
+
+
+            element.innerText =
+                String(minutes).padStart(2, "0")
+                + ":"
+                + String(secs).padStart(2, "0");
+
+        }
+
+
+        /* ================================================= */
+        /* POSITIVE SELF TALK */
+        /* ================================================= */
+
+        function newPositivePrompt() {
+
+            const prompts = [
+
+                "You are allowed to take things one step at a time. 💜",
+
+                "It is okay to pause and start again.",
+
+                "Your progress does not have to be perfect.",
+
+                "Give yourself the same patience you give others.",
+
+                "One small step is still progress.",
+
+                "You do not have to figure everything out at once."
+
+            ];
+
+
+            const random =
+                prompts[
+                    Math.floor(
+                        Math.random() * prompts.length
+                    )
+                ];
+
+
+            const element =
+                document.getElementById(
+                    "positivePrompt"
+                );
+
+
+            if (element) {
+
+                element.innerText =
+                    random;
+
+            }
+
+        }
+
+
+        /* ================================================= */
+        /* DAILY MOTIVATION */
+        /* ================================================= */
+
+        function newMotivation() {
+
+            const messages = [
+
+                "Small steps still move you forward. 🌱",
+
+                "Keep going at your own pace.",
+
+                "Today is another chance to begin again.",
+
+                "Progress can be quiet too.",
+
+                "You are doing better than you think.",
+
+                "Focus on the next small step."
+
+            ];
+
+
+            const random =
+                messages[
+                    Math.floor(
+                        Math.random() * messages.length
+                    )
+                ];
+
+
+            const element =
+                document.getElementById(
+                    "motivationMessage"
+                );
+
+
+            if (element) {
+
+                element.innerText =
+                    random;
+
+            }
+
+        }
+
+
+        /* ================================================= */
+        /* MODAL CLOSE */
+        /* ================================================= */
+
+        const resourceModal =
+            document.getElementById(
+                "resourceModal"
+            );
+
+
+        if (resourceModal) {
+
+            resourceModal.addEventListener(
+                "hidden.bs.modal",
+                function() {
+
+                    stopActivity();
+
+                }
+            );
+
+        }
+
+    </script>
+
+</body>
+
+</html>

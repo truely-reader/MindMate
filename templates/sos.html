@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SOS Support - MindMate</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+        .sos-page {
+            min-height: 100vh;
+        }
+
+        .sos-content {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .sos-intro {
+            background: linear-gradient(135deg, #eef2ff, #ffffff);
+            border: 1px solid #e0e7ff;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .sos-intro-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: #fee2e2;
+            color: #dc2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 18px;
+        }
+
+        .sos-intro h2 {
+            color: #1f2937;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .sos-intro p {
+            color: #6b7280;
+            margin-bottom: 0;
+            line-height: 1.7;
+        }
+
+        .sos-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 25px;
+            height: 100%;
+            box-shadow: 0 5px 20px rgba(79, 70, 229, 0.06);
+        }
+
+        .sos-card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+            font-size: 21px;
+        }
+
+        .emergency-icon {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .trusted-icon {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .counselor-icon {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .sos-card h4 {
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .sos-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .sos-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+        }
+
+        .emergency-action {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .emergency-action:hover {
+            background: #b91c1c;
+            color: #ffffff;
+        }
+
+        .counselor-action {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .counselor-action:hover {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .trusted-contact-section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            color: #1f2937;
+            font-weight: 700;
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .contact-form-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(79, 70, 229, 0.06);
+        }
+
+        .form-label {
+            color: #374151;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 11px 13px;
+            font-size: 14px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.10);
+        }
+
+        .save-contact-btn {
+            background: #4f46e5;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 20px;
+            font-weight: 600;
+        }
+
+        .save-contact-btn:hover {
+            background: #4338ca;
+            color: #ffffff;
+        }
+
+        .contact-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 20px;
+            height: 100%;
+            box-shadow: 0 4px 16px rgba(79, 70, 229, 0.05);
+        }
+
+        .contact-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: #eef2ff;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .contact-name {
+            color: #1f2937;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .contact-relation {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .contact-phone {
+            color: #374151;
+            font-size: 14px;
+            margin-top: 14px;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .call-btn {
+            flex: 1;
+            background: #ecfdf5;
+            color: #059669;
+            border: none;
+            border-radius: 9px;
+            padding: 9px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .call-btn:hover {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 9px;
+            padding: 9px 13px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .delete-btn:hover {
+            background: #fecaca;
+            color: #b91c1c;
+        }
+
+        .empty-contacts {
+            background: #f9fafb;
+            border: 1px dashed #d1d5db;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .empty-contacts i {
+            color: #9ca3af;
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .safety-note {
+            margin-top: 25px;
+            padding: 18px 20px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .safety-note i {
+            color: #4f46e5;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+
+            .sos-intro {
+                padding: 22px;
+            }
+
+            .sos-card,
+            .contact-form-card {
+                padding: 20px;
+            }
+
+        }
+    </style>
+</head>
+
+<body class="dashboard-page sos-page">
+
+    <!-- Sidebar -->
+    <aside class="mindmate-sidebar" id="mindmateSidebar">
+
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+
+            <div>
+                <h2>MindMate</h2>
+                <span>Better Mind, Brighter You</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{{ url_for('mood') }}" class="sidebar-link">
+                <i class="fa-solid fa-face-smile"></i>
+                <span>Track Mood</span>
+            </a>
+
+            <a href="{{ url_for('journal') }}" class="sidebar-link">
+                <i class="fa-solid fa-book"></i>
+                <span>Journal</span>
+            </a>
+
+            <a href="{{ url_for('chat') }}" class="sidebar-link">
+                <i class="fa-solid fa-robot"></i>
+                <span>AI Support</span>
+            </a>
+
+            <a href="{{ url_for('resources') }}" class="sidebar-link">
+                <i class="fa-solid fa-heart"></i>
+                <span>Resources</span>
+            </a>
+
+            <a href="{{ url_for('counselor') }}" class="sidebar-link">
+                <i class="fa-solid fa-user-doctor"></i>
+                <span>Counselor</span>
+            </a>
+
+            <a href="{{ url_for('sos') }}" class="sidebar-link sos-link active">
+                <i class="fa-solid fa-life-ring"></i>
+                <span>SOS Support</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- Mobile Overlay -->
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        onclick="closeSidebar()"
+    ></div>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+
+        <!-- Topbar -->
+        <header class="dashboard-topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    class="mobile-menu-btn"
+                    onclick="toggleSidebar()"
+                    aria-label="Open menu"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div>
+                    <h1>SOS Support</h1>
+                    <p>Get immediate help and support when you need it.</p>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="profile-box">
+
+                    <div class="profile-avatar">
+                        {{ session.get('student_name', 'Student')[0] | upper }}
+                    </div>
+
+                    <div class="profile-info">
+                        <strong>
+                            {{ session.get('student_name', 'Student') }}
+                        </strong>
+                        <span>Student</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- Page Content -->
+        <section class="dashboard-content">
+
+            <div class="sos-content">
+
+                <!-- Back Button -->
+                <button
+                    type="button"
+                    class="btn btn-light mb-4"
+                    onclick="goBack()"
+                >
+                    <i class="fa-solid fa-arrow-left me-2"></i>
+                    Back
+                </button>
+
+                <!-- Intro -->
+                <div class="sos-intro">
+
+                    <div class="sos-intro-icon">
+                        <i class="fa-solid fa-life-ring"></i>
+                    </div>
+
+                    <h2>You don't have to handle everything alone.</h2>
+
+                    <p>
+                        If you are feeling overwhelmed or need immediate
+                        support, reach out to someone you trust or use one
+                        of the support options below.
+                    </p>
+
+                </div>
+
+                <!-- Support Cards -->
+                <div class="row g-4">
+
+                    <!-- Emergency -->
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="sos-card">
+
+                            <div class="sos-card-icon emergency-icon">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+
+                            <h4>Immediate Emergency</h4>
+
+                            <p>
+                                If you are in immediate danger or need urgent
+                                emergency assistance, contact your local
+                                emergency service or go to the nearest
+                                emergency department.
+                            </p>
+
+                            <a
+                                href="tel:112"
+                                class="sos-action emergency-action"
+                            >
+                                <i class="fa-solid fa-phone"></i>
+                                Call 112
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Trusted Person -->
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="sos-card">
+
+                            <div class="sos-card-icon trusted-icon">
+                                <i class="fa-solid fa-people-arrows"></i>
+                            </div>
+
+                            <h4>Talk to Someone You Trust</h4>
+
+                            <p>
+                                Consider reaching out to a parent, guardian,
+                                teacher, friend, mentor, or another trusted
+                                person. You do not have to deal with difficult
+                                feelings by yourself.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Counselor -->
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="sos-card">
+
+                            <div class="sos-card-icon counselor-icon">
+                                <i class="fa-solid fa-user-doctor"></i>
+                            </div>
+
+                            <h4>Talk to a Counselor</h4>
+
+                            <p>
+                                A qualified counselor can provide professional
+                                support and help you work through academic,
+                                emotional, or personal concerns.
+                            </p>
+
+                            <a
+                                href="{{ url_for('counselor') }}"
+                                class="sos-action counselor-action"
+                            >
+                                <i class="fa-solid fa-calendar-check"></i>
+                                Find a Counselor
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Trusted Contacts -->
+                <div class="trusted-contact-section">
+
+                    <h3 class="section-title">
+                        Trusted Emergency Contacts
+                    </h3>
+
+                    <p class="section-subtitle">
+                        Save someone you trust so you can quickly contact
+                        them when you need support.
+                    </p>
+
+                    <!-- Add Contact Form -->
+                    <div class="contact-form-card mb-4">
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('save_emergency_contact') }}"
+                        >
+
+                            <div class="row g-3">
+
+                                <div class="col-md-4">
+
+                                    <label class="form-label">
+                                        Contact Name
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="contact_name"
+                                        class="form-control"
+                                        placeholder="e.g. Mom"
+                                        maxlength="100"
+                                        required
+                                    >
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label class="form-label">
+                                        Relationship
+                                    </label>
+
+                                    <select
+                                        name="relationship"
+                                        class="form-select"
+                                        required
+                                    >
+                                        <option value="">
+                                            Select
+                                        </option>
+
+                                        <option value="Parent">
+                                            Parent
+                                        </option>
+
+                                        <option value="Guardian">
+                                            Guardian
+                                        </option>
+
+                                        <option value="Sibling">
+                                            Sibling
+                                        </option>
+
+                                        <option value="Friend">
+                                            Friend
+                                        </option>
+
+                                        <option value="Teacher">
+                                            Teacher
+                                        </option>
+
+                                        <option value="Mentor">
+                                            Mentor
+                                        </option>
+
+                                        <option value="Other">
+                                            Other
+                                        </option>
+                                    </select>
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label class="form-label">
+                                        Phone Number
+                                    </label>
+
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        class="form-control"
+                                        placeholder="Phone number"
+                                        maxlength="20"
+                                        required
+                                    >
+
+                                </div>
+
+                                <div class="col-md-2 d-flex align-items-end">
+
+                                    <button
+                                        type="submit"
+                                        class="save-contact-btn w-100"
+                                    >
+                                        <i class="fa-solid fa-plus me-1"></i>
+                                        Save
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                    <!-- Saved Contacts -->
+                    {% if contacts %}
+
+                        <div class="row g-4">
+
+                            {% for contact in contacts %}
+
+                                <div class="col-lg-4 col-md-6">
+
+                                    <div class="contact-card">
+
+                                        <div class="d-flex align-items-center gap-3">
+
+                                            <div class="contact-avatar">
+                                                <i class="fa-solid fa-user"></i>
+                                            </div>
+
+                                            <div>
+                                                <div class="contact-name">
+                                                    {{ contact.contact_name }}
+                                                </div>
+
+                                                <div class="contact-relation">
+                                                    {{ contact.relationship }}
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="contact-phone">
+                                            <i class="fa-solid fa-phone me-2"></i>
+                                            {{ contact.phone }}
+                                        </div>
+
+                                        <div class="contact-actions">
+
+                                            <a
+                                                href="tel:{{ contact.phone }}"
+                                                class="call-btn"
+                                            >
+                                                <i class="fa-solid fa-phone me-1"></i>
+                                                Call
+                                            </a>
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('delete_emergency_contact', contact_id=contact.id) }}"
+                                                onsubmit="return confirm('Remove this trusted contact?');"
+                                            >
+
+                                                <button
+                                                    type="submit"
+                                                    class="delete-btn"
+                                                    title="Delete contact"
+                                                >
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="empty-contacts">
+
+                            <i class="fa-solid fa-address-book"></i>
+
+                            <div>
+                                No trusted contacts saved yet.
+                            </div>
+
+                            <small>
+                                Add someone you trust using the form above.
+                            </small>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- Safety Note -->
+                <div class="safety-note">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <strong>Important:</strong>
+                    MindMate provides general support and information.
+                    It is not a replacement for professional medical or
+                    emergency services. If you need urgent help, contact
+                    local emergency services or a trusted person who can
+                    help you get appropriate support.
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById("mindmateSidebar");
+
+            const overlay =
+                document.getElementById("sidebarOverlay");
+
+            if (sidebar && overlay) {
+
+                sidebar.classList.toggle("sidebar-open");
+                overlay.classList.toggle("overlay-active");
+
+            }
+
+        }
+
+
+        function closeSidebar() {
+
+            const sidebar =
+                document.getElementById("mindmateSidebar");
+
+            const overlay =
+                document.getElementById("sidebarOverlay");
+
+            if (sidebar && overlay) {
+
+                sidebar.classList.remove("sidebar-open");
+                overlay.classList.remove("overlay-active");
+
+            }
+
+        }
+
+
+        document
+            .querySelectorAll(".sidebar-link")
+            .forEach(function(link) {
+
+                link.addEventListener("click", function() {
+
+                    if (window.innerWidth <= 900) {
+                        closeSidebar();
+                    }
+
+                });
+
+            });
+
+
+        function goBack() {
+
+            if (window.history.length > 1) {
+
+                window.history.back();
+
+            } else {
+
+                window.location.href =
+                    "{{ url_for('dashboard') }}";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>

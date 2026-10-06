@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Journal | MindMate</title>
+
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+
+    <!-- MindMate CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body class="dashboard-page edit-journal-page">
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="mindmate-sidebar" id="mindmateSidebar">
+
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+            <i class="fa-solid fa-brain"></i>
+        </div>
+
+        <div>
+            <h2>MindMate</h2>
+            <span>Better Mind, Brighter You</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('mood') }}" class="sidebar-link">
+            <i class="fa-solid fa-face-smile"></i>
+            <span>Track Mood</span>
+        </a>
+
+        <a href="{{ url_for('journal') }}" class="sidebar-link">
+            <i class="fa-solid fa-book"></i>
+            <span>Journal</span>
+        </a>
+
+        <a href="{{ url_for('chat') }}" class="sidebar-link">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Support</span>
+        </a>
+
+        <a href="{{ url_for('resources') }}" class="sidebar-link">
+            <i class="fa-solid fa-heart"></i>
+            <span>Resources</span>
+        </a>
+
+        <a href="{{ url_for('counselor') }}" class="sidebar-link">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Counselor</span>
+        </a>
+
+        <a href="{{ url_for('sos') }}" class="sidebar-link sos-link">
+            <i class="fa-solid fa-life-ring"></i>
+            <span>SOS Support</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+</aside>
+
+
+<!-- =====================================================
+     MOBILE SIDEBAR OVERLAY
+===================================================== -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+    onclick="closeSidebar()"
+>
+</div>
+
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+
+<main class="dashboard-main edit-journal-main">
+
+
+    <!-- =================================================
+         TOP BAR
+    ================================================= -->
+
+    <header class="dashboard-topbar">
+
+
+        <div class="topbar-left">
+
+
+            <!-- Mobile Menu -->
+
+            <button
+                class="sidebar-toggle"
+                id="sidebarToggle"
+                onclick="toggleSidebar()"
+                type="button"
+                aria-label="Open menu"
+            >
+
+                <i class="fa-solid fa-bars"></i>
+
+            </button>
+
+
+            <!-- Back -->
+
+            <button
+                class="back-button"
+                onclick="goBack()"
+                type="button"
+            >
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                <span>
+                    Back
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- Profile -->
+
+        <div class="topbar-right">
+
+            <div class="profile-mini">
+
+                <div class="profile-avatar">
+
+                    {{ session.get('student_name', 'Student')[0] | upper }}
+
+                </div>
+
+                <span>
+                    {{ session.get('student_name', 'Student') }}
+                </span>
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =================================================
+         PAGE CONTENT
+    ================================================= -->
+
+    <div class="edit-journal-content">
+
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================= -->
+
+        <section class="edit-journal-header">
+
+
+            <div class="edit-journal-header-icon">
+
+                <i class="fa-solid fa-pen"></i>
+
+            </div>
+
+
+            <div>
+
+                <h1>
+                    Edit Journal
+                </h1>
+
+                <p>
+                    Make changes to your journal entry and save them.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             EDIT CARD
+        ================================================= -->
+
+        <section class="edit-journal-card">
+
+
+            <!-- CARD HEADER -->
+
+            <div class="edit-journal-card-header">
+
+                <div class="edit-journal-card-icon">
+
+                    <i class="fa-solid fa-pen-to-square"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h2>
+                        Update Your Thoughts
+                    </h2>
+
+                    <p>
+                        Your previous journal content is shown below.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 EDIT FORM
+            ================================================= -->
+
+            <form
+                method="POST"
+                action="{{ url_for('edit_journal', journal_id=journal.id) }}"
+            >
+
+
+                <!-- TITLE -->
+
+                <div class="edit-journal-form-group">
+
+                    <label
+                        for="title"
+                        class="edit-journal-label"
+                    >
+
+                        Journal Title
+
+                        <span>
+                            (Optional)
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        class="edit-journal-input"
+                        value="{{ journal.title or '' }}"
+                        placeholder="Give your journal a title..."
+                        maxlength="150"
+                    >
+
+                </div>
+
+
+
+                <!-- CONTENT -->
+
+                <div class="edit-journal-form-group">
+
+                    <label
+                        for="content"
+                        class="edit-journal-label"
+                    >
+
+                        What's on your mind?
+
+                    </label>
+
+
+                    <textarea
+                        id="content"
+                        name="content"
+                        class="edit-journal-textarea"
+                        maxlength="5000"
+                        required
+                    >{{ journal.content }}</textarea>
+
+
+                    <!-- CHARACTER COUNT -->
+
+                    <div class="edit-journal-character-count">
+
+                        <span>
+
+                            <i class="fa-solid fa-lock"></i>
+
+                            Your thoughts are private.
+
+                        </span>
+
+
+                        <span id="editCharCount">
+
+                            {{ journal.content|length }} / 5000
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ACTION BUTTONS
+                ================================================= -->
+
+                <div class="edit-journal-actions">
+
+
+                    <!-- CANCEL -->
+
+                    <a
+                        href="{{ url_for('view_journal', journal_id=journal.id) }}"
+                        class="edit-cancel-btn"
+                    >
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Cancel
+
+                    </a>
+
+
+
+                    <!-- SAVE -->
+
+                    <button
+                        type="submit"
+                        class="edit-save-btn"
+                    >
+
+                        <i class="fa-solid fa-check"></i>
+
+                        Save Changes
+
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PRIVACY NOTE
+        ================================================= -->
+
+        <div class="edit-journal-privacy">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <span>
+                Your journal entries are private and visible only to you.
+            </span>
+
+        </div>
+
+
+    </div>
+
+</main>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+function toggleSidebar() {
+
+    const sidebar =
+        document.getElementById("mindmateSidebar");
+
+    const overlay =
+        document.getElementById("sidebarOverlay");
+
+
+    if (sidebar && overlay) {
+
+        sidebar.classList.toggle("sidebar-open");
+
+        overlay.classList.toggle("overlay-active");
+
+    }
+
+}
+
+
+
+function closeSidebar() {
+
+    const sidebar =
+        document.getElementById("mindmateSidebar");
+
+    const overlay =
+        document.getElementById("sidebarOverlay");
+
+
+    if (sidebar && overlay) {
+
+        sidebar.classList.remove("sidebar-open");
+
+        overlay.classList.remove("overlay-active");
+
+    }
+
+}
+
+
+
+/* =====================================================
+   CLOSE SIDEBAR ON MOBILE
+===================================================== */
+
+document.querySelectorAll(".sidebar-link").forEach(
+
+    function(link) {
+
+        link.addEventListener(
+
+            "click",
+
+            function() {
+
+                if (window.innerWidth <= 900) {
+
+                    closeSidebar();
+
+                }
+
+            }
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+function goBack() {
+
+    if (window.history.length > 1) {
+
+        window.history.back();
+
+    } else {
+
+        window.location.href =
+            "{{ url_for('journal_history') }}";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   COMING SOON
+===================================================== */
+
+function comingSoon(event, pageName) {
+
+    event.preventDefault();
+
+    alert(
+        pageName +
+        " will be available soon."
+    );
+
+}
+
+
+
+/* =====================================================
+   CHARACTER COUNTER
+===================================================== */
+
+const editContentBox =
+    document.getElementById("content");
+
+const editCharCount =
+    document.getElementById("editCharCount");
+
+
+if (editContentBox && editCharCount) {
+
+    editContentBox.addEventListener(
+
+        "input",
+
+        function() {
+
+            editCharCount.textContent =
+                this.value.length + " / 5000";
+
+        }
+
+    );
+
+}
+
+</script>
+
+
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+</body>
+
+</html>

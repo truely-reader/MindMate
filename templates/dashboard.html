@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>MindMate - Dashboard</title>
+
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+
+    <!-- Main CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+
+    <!-- Chart.js -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+
+</head>
+
+
+<body class="dashboard-page">
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="mindmate-sidebar" id="mindmateSidebar">
+
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+            <i class="fa-solid fa-brain"></i>
+        </div>
+
+        <div>
+            <h2>MindMate</h2>
+            <span>Better Mind, Brighter You</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('mood') }}" class="sidebar-link">
+            <i class="fa-solid fa-face-smile"></i>
+            <span>Track Mood</span>
+        </a>
+
+        <a href="{{ url_for('journal') }}" class="sidebar-link">
+            <i class="fa-solid fa-book"></i>
+            <span>Journal</span>
+        </a>
+
+        <a href="{{ url_for('chat') }}" class="sidebar-link">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Support</span>
+        </a>
+
+        <a href="{{ url_for('resources') }}" class="sidebar-link">
+            <i class="fa-solid fa-heart"></i>
+            <span>Resources</span>
+        </a>
+
+        <a href="{{ url_for('counselor') }}" class="sidebar-link">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Counselor</span>
+        </a>
+
+        <a href="{{ url_for('sos') }}" class="sidebar-link sos-link">
+            <i class="fa-solid fa-life-ring"></i>
+            <span>SOS Support</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+</aside>
+
+
+<!-- =====================================================
+     MOBILE SIDEBAR OVERLAY
+===================================================== -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+    onclick="closeSidebar()">
+</div>
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+
+<main class="dashboard-main">
+
+
+    <!-- =================================================
+         TOP BAR
+    ================================================== -->
+
+    <header class="dashboard-topbar">
+
+
+        <div class="topbar-left">
+
+
+            <!-- Mobile Menu -->
+
+            <button
+                class="sidebar-toggle"
+                id="sidebarToggle"
+                onclick="toggleSidebar()"
+                type="button"
+            >
+
+                <i class="fa-solid fa-bars"></i>
+
+            </button>
+
+
+            <!-- Back -->
+
+            <button
+                class="back-button"
+                onclick="goBack()"
+                type="button"
+            >
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                <span>
+                    Back
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+
+            <!-- Notification -->
+
+            <button
+                class="notification-btn"
+                type="button"
+            >
+
+                <i class="fa-regular fa-bell"></i>
+
+            </button>
+
+
+            <!-- Profile -->
+
+            <div class="profile-mini">
+
+                <div class="profile-avatar">
+
+                    {{ student_name[0] | upper }}
+
+                </div>
+
+                <span>
+                    {{ student_name }}
+                </span>
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =================================================
+         WELCOME
+    ================================================== -->
+
+    <section class="welcome-area">
+
+        <h1>
+
+            Welcome back, {{ student_name }}
+
+            <span>
+                💜
+            </span>
+
+        </h1>
+
+        <p>
+
+            Take a moment to understand your mood
+            and take care of yourself.
+
+        </p>
+
+    </section>
+
+
+    <!-- =================================================
+         QUOTE OF THE DAY
+    ================================================== -->
+
+    <section class="dashboard-quote">
+
+
+        <div class="quote-content">
+
+
+            <div class="quote-heading">
+
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                QUOTE OF THE DAY
+
+            </div>
+
+
+            {% if quote %}
+
+                <h3>
+
+                    “{{ quote.quote_text }}”
+
+                </h3>
+
+                {% if quote.author %}
+
+                    <p>
+                        — {{ quote.author }}
+                    </p>
+
+                {% endif %}
+
+            {% else %}
+
+                <h3>
+
+                    “You don't have to have everything
+                    figured out today.”
+
+                </h3>
+
+                <p>
+                    — MindMate
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="quote-art">
+
+            <i class="fa-solid fa-heart"></i>
+
+            <i class="fa-solid fa-seedling"></i>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         MAIN DASHBOARD GRID
+    ================================================== -->
+
+    <div class="dashboard-layout">
+
+
+        <!-- =================================================
+             LEFT CONTENT
+        ================================================== -->
+
+        <div class="dashboard-content">
+
+
+            <!-- =================================================
+                 OVERALL MOOD ANALYTICS
+            ================================================== -->
+
+            <section class="analytics-card">
+
+
+                <div class="section-heading">
+
+
+                    <div>
+
+                        <div class="heading-title">
+
+                            <i class="fa-solid fa-chart-column"></i>
+
+                            <h2>
+                                Overall Mood Analytics
+                            </h2>
+
+                        </div>
+
+                        <p>
+
+                            Your mood patterns based on
+                            your recorded entries.
+
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="{{ url_for('mood_analytics') }}"
+                        class="details-btn"
+                    >
+
+                        Detailed Analytics
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+
+                {% if mood_data %}
+
+
+                <div class="analytics-body">
+
+
+                    <!-- DONUT CHART -->
+
+                    <div class="donut-area">
+
+                        <div class="donut-wrapper">
+
+                            <canvas id="moodChart"></canvas>
+
+                            <div class="donut-center">
+
+                                <span>
+                                    Total
+                                </span>
+
+                                <strong>
+                                    {{ mood_percentages.total }}
+                                </strong>
+
+                                <small>
+                                    entries
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MOOD LIST -->
+
+                    <div class="mood-list">
+
+                        {% for label in mood_labels %}
+
+                        <div class="mood-list-row">
+
+                            <div class="mood-name">
+
+                                <span class="mood-dot"></span>
+
+                                <span>
+                                    {{ label }}
+                                </span>
+
+                            </div>
+
+                            <strong>
+                                {{ mood_counts[loop.index0] }}
+                            </strong>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- MOOD SUMMARY -->
+
+                    <div class="mood-summary">
+
+
+                        <!-- POSITIVE -->
+
+                        <div class="summary-box positive">
+
+                            <div class="summary-icon">
+
+                                <i class="fa-regular fa-face-smile"></i>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Positive
+                                </span>
+
+                                <strong>
+                                    {{ mood_percentages.positive }}%
+                                </strong>
+
+                                <small>
+                                    Positive moods
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- NEUTRAL -->
+
+                        <div class="summary-box neutral">
+
+                            <div class="summary-icon">
+
+                                <i class="fa-regular fa-face-meh"></i>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Neutral
+                                </span>
+
+                                <strong>
+                                    {{ mood_percentages.neutral }}%
+                                </strong>
+
+                                <small>
+                                    Neutral moods
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- NEGATIVE -->
+
+                        <div class="summary-box negative">
+
+                            <div class="summary-icon">
+
+                                <i class="fa-regular fa-face-frown"></i>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Negative
+                                </span>
+
+                                <strong>
+                                    {{ mood_percentages.negative }}%
+                                </strong>
+
+                                <small>
+                                    Negative moods
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {% else %}
+
+
+                <!-- EMPTY ANALYTICS -->
+
+                <div class="empty-analytics">
+
+                    <i class="fa-regular fa-face-smile"></i>
+
+                    <h3>
+                        No mood data yet
+                    </h3>
+
+                    <p>
+
+                        Start tracking your mood
+                        to see your analytics.
+
+                    </p>
+
+                    <a
+                        href="{{ url_for('mood') }}"
+                        class="primary-btn"
+                    >
+
+                        Track Mood
+
+                    </a>
+
+                </div>
+
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- =================================================
+                 WEEKLY MOOD TREND
+            ================================================== -->
+
+            <section class="weekly-card">
+
+
+                <div class="weekly-heading">
+
+
+                    <div>
+
+                        <div class="heading-title">
+
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+
+                            <h2>
+                                Weekly Mood Trend
+                            </h2>
+
+                        </div>
+
+                        <p>
+
+                            Your mood activity over
+                            the last 7 days.
+
+                        </p>
+
+                    </div>
+
+
+                    <span>
+                        Last 7 days
+                    </span>
+
+                </div>
+
+
+                {% if weekly_labels %}
+
+                    <div class="weekly-chart">
+
+                        <canvas id="weeklyMoodChart"></canvas>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="weekly-empty">
+
+                        Start tracking your mood
+                        to see your weekly trend.
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+
+        <!-- =================================================
+             RIGHT SIDE
+        ================================================== -->
+
+        <aside class="dashboard-right">
+
+
+            <!-- =================================================
+                 QUICK ACTIONS
+            ================================================== -->
+
+            <section class="quick-actions">
+
+
+                <div class="quick-heading">
+
+                    <i class="fa-solid fa-bolt"></i>
+
+                    <div>
+
+                        <h2>
+                            Quick Actions
+                        </h2>
+
+                        <p>
+
+                            Take the next step towards
+                            a healthier you
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TRACK MOOD -->
+
+                <a
+                    href="{{ url_for('mood') }}"
+                    class="quick-action"
+                >
+
+                    <div class="quick-icon">
+
+                        <i class="fa-regular fa-face-smile"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Track Mood
+                        </strong>
+
+                        <span>
+                            How are you feeling today?
+                        </span>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </a>
+
+
+                <!-- JOURNAL -->
+
+                <a
+                    href="{{ url_for('journal') }}"
+                    class="quick-action"
+                >
+
+                    <div class="quick-icon">
+
+                        <i class="fa-solid fa-pen"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Journal
+                        </strong>
+
+                        <span>
+                            Write your thoughts
+                        </span>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </a>
+
+
+                <!-- AI SUPPORT -->
+
+                <a
+                    href="#"
+                    class="quick-action"
+                    onclick="comingSoon(event, 'AI Support')"
+                >
+
+                    <div class="quick-icon">
+
+                        <i class="fa-solid fa-robot"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            AI Support
+                        </strong>
+
+                        <span>
+                            Chat with MindMate
+                        </span>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </a>
+
+
+                <!-- RESOURCES -->
+
+                <a
+                    href="{{ url_for('resources') }}"
+                    class="quick-action"
+                >
+
+                    <div class="quick-icon">
+
+                        <i class="fa-solid fa-leaf"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Resources
+                        </strong>
+
+                        <span>
+                            Explore helpful resources
+                        </span>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </a>
+
+            </section>
+
+
+            <!-- =================================================
+                 SOS SUPPORT
+            ================================================== -->
+
+            <section class="sos-card">
+
+
+                <div class="sos-icon">
+
+                    <i class="fa-solid fa-life-ring"></i>
+
+                </div>
+
+
+                <div class="sos-content">
+
+                    <h3>
+                        Need Immediate Support?
+                    </h3>
+
+                    <p>
+
+                        Access important support
+                        and emergency information.
+
+                    </p>
+
+                    <a
+                        href="#"
+                        class="sos-link"
+                        onclick="comingSoon(event, 'SOS Support')"
+                    >
+
+                        Get Support
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 MOOD COUNT
+            ================================================== -->
+
+            <section class="mood-count">
+
+
+                <div class="mood-count-heading">
+
+                    <i class="fa-regular fa-calendar-check"></i>
+
+                    <span>
+                        MOOD TRACKING
+                    </span>
+
+                </div>
+
+
+                <strong>
+
+                    {{ mood_percentages.total }}
+
+                </strong>
+
+
+                <p>
+
+                    Total mood entries
+
+                </p>
+
+
+                <div class="mood-decoration">
+
+                    <i class="fa-solid fa-seedling"></i>
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+function toggleSidebar() {
+
+    const sidebar =
+        document.getElementById("mindmateSidebar");
+
+    const overlay =
+        document.getElementById("sidebarOverlay");
+
+    sidebar.classList.toggle("sidebar-open");
+
+    overlay.classList.toggle("overlay-active");
+
+}
+
+
+function closeSidebar() {
+
+    const sidebar =
+        document.getElementById("mindmateSidebar");
+
+    const overlay =
+        document.getElementById("sidebarOverlay");
+
+    sidebar.classList.remove("sidebar-open");
+
+    overlay.classList.remove("overlay-active");
+
+}
+
+
+/* =====================================================
+   CLOSE SIDEBAR WHEN A LINK IS CLICKED ON MOBILE
+===================================================== */
+
+document.querySelectorAll(".sidebar-link").forEach(
+    function(link) {
+
+        link.addEventListener(
+            "click",
+            function() {
+
+                if (window.innerWidth <= 900) {
+                    closeSidebar();
+                }
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+function goBack() {
+
+    if (window.history.length > 1) {
+
+        window.history.back();
+
+    } else {
+
+        window.location.href =
+            "{{ url_for('dashboard') }}";
+
+    }
+
+}
+
+
+/* =====================================================
+   MOOD DOUGHNUT CHART
+===================================================== */
+
+{% if mood_data %}
+
+const moodLabels =
+    {{ mood_labels | tojson }};
+
+const moodCounts =
+    {{ mood_counts | tojson }};
+
+const moodCanvas =
+    document.getElementById("moodChart");
+
+
+if (moodCanvas) {
+
+    new Chart(
+        moodCanvas,
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: moodLabels,
+
+                datasets: [{
+
+                    data: moodCounts,
+
+                    backgroundColor: [
+                        "#7652D4",
+                        "#9B7BE0",
+                        "#C0A8F0",
+                        "#F5C86A",
+                        "#F28DB0",
+                        "#72B7E8",
+                        "#8FD3A8"
+                    ],
+
+                    borderColor: "#ffffff",
+
+                    borderWidth: 3,
+
+                    hoverOffset: 8
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: "68%",
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+{% endif %}
+
+
+/* =====================================================
+   WEEKLY MOOD CHART
+===================================================== */
+
+{% if weekly_labels %}
+
+const weeklyLabels =
+    {{ weekly_labels | tojson }};
+
+const weeklyValues =
+    {{ weekly_values | tojson }};
+
+const weeklyCanvas =
+    document.getElementById("weeklyMoodChart");
+
+
+if (weeklyCanvas) {
+
+    new Chart(
+        weeklyCanvas,
+        {
+
+            type: "line",
+
+            data: {
+
+                labels: weeklyLabels,
+
+                datasets: [{
+
+                    label: "Mood Entries",
+
+                    data: weeklyValues,
+
+                    borderColor: "#7652D4",
+
+                    backgroundColor:
+                        "rgba(118, 82, 212, 0.12)",
+
+                    borderWidth: 3,
+
+                    pointBackgroundColor:
+                        "#7652D4",
+
+                    pointBorderColor:
+                        "#ffffff",
+
+                    pointBorderWidth: 2,
+
+                    pointRadius: 5,
+
+                    pointHoverRadius: 7,
+
+                    fill: true,
+
+                    tension: 0.35
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            stepSize: 1
+
+                        }
+
+                    },
+
+                    x: {
+
+                        grid: {
+
+                            display: false
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+{% endif %}
+
+
+/* =====================================================
+   COMING SOON
+===================================================== */
+
+function comingSoon(event, pageName) {
+
+    event.preventDefault();
+
+    alert(
+        pageName +
+        " will be available soon."
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>

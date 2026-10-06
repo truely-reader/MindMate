@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Track Mood | MindMate</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- MindMate CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="dashboard-page mood-page">
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="mindmate-sidebar" id="mindmateSidebar">
+
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+            <i class="fa-solid fa-brain"></i>
+        </div>
+
+        <div>
+            <h2>MindMate</h2>
+            <span>Better Mind, Brighter You</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('mood') }}" class="sidebar-link">
+            <i class="fa-solid fa-face-smile"></i>
+            <span>Track Mood</span>
+        </a>
+
+        <a href="{{ url_for('journal') }}" class="sidebar-link">
+            <i class="fa-solid fa-book"></i>
+            <span>Journal</span>
+        </a>
+
+        <a href="{{ url_for('chat') }}" class="sidebar-link">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Support</span>
+        </a>
+
+        <a href="{{ url_for('resources') }}" class="sidebar-link">
+            <i class="fa-solid fa-heart"></i>
+            <span>Resources</span>
+        </a>
+
+        <a href="{{ url_for('counselor') }}" class="sidebar-link">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Counselor</span>
+        </a>
+
+        <a href="{{ url_for('sos') }}" class="sidebar-link sos-link">
+            <i class="fa-solid fa-life-ring"></i>
+            <span>SOS Support</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+</aside>
+
+
+<!-- MOBILE OVERLAY -->
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+></div>
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+
+<main class="dashboard-main mood-main">
+
+
+    <!-- =================================================
+         TOPBAR
+    ================================================= -->
+
+    <header class="dashboard-topbar">
+
+        <div class="topbar-left">
+
+            <!-- Mobile Menu -->
+            <button
+                class="sidebar-toggle"
+                id="sidebarToggle"
+                type="button"
+                aria-label="Open menu"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+
+            <!-- Back Button -->
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="page-back-btn"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+
+        </div>
+
+
+        <!-- Profile -->
+        <div class="topbar-right">
+
+            <div class="topbar-avatar">
+                {{ student_name[0] | upper if student_name else 'U' }}
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =================================================
+         MOOD CONTENT
+    ================================================= -->
+
+    <div class="mood-content">
+
+
+        <!-- PAGE HEADER -->
+
+        <section class="mood-page-header">
+
+            <div class="mood-page-icon">
+                <i class="fa-regular fa-face-smile"></i>
+            </div>
+
+            <div>
+
+                <h1>How are you feeling today?</h1>
+
+                <p>
+                    Take a moment to check in with yourself.
+                    There are no right or wrong answers.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FLASH MESSAGES
+        ================================================= -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                <div class="mood-flash-area">
+
+                    {% for category, message in messages %}
+
+                        <div
+                            class="alert alert-{{ category }} alert-dismissible fade show"
+                            role="alert"
+                        >
+
+                            {{ message }}
+
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Close"
+                            ></button>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- =================================================
+             MOOD FORM
+        ================================================= -->
+
+        <section class="mood-form-card">
+
+            <form method="POST">
+
+
+                <!-- MOOD SELECTION -->
+
+                <div class="mood-form-section">
+
+                    <div class="section-title">
+
+                        <i class="fa-solid fa-heart"></i>
+
+                        <span>Select your mood</span>
+
+                    </div>
+
+
+                    <div class="mood-options-grid">
+
+
+                        <!-- HAPPY -->
+
+                        <label class="mood-choice">
+
+                            <input
+                                type="radio"
+                                name="mood"
+                                value="Happy"
+                                required
+                            >
+
+                            <div class="mood-choice-content">
+
+                                <span class="mood-choice-emoji">
+                                    😊
+                                </span>
+
+                                <span class="mood-choice-name">
+                                    Happy
+                                </span>
+
+                                <span class="mood-choice-subtitle">
+                                    Feeling good
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- CALM -->
+
+                        <label class="mood-choice">
+
+                            <input
+                                type="radio"
+                                name="mood"
+                                value="Calm"
+                            >
+
+                            <div class="mood-choice-content">
+
+                                <span class="mood-choice-emoji">
+                                    😌
+                                </span>
+
+                                <span class="mood-choice-name">
+                                    Calm
+                                </span>
+
+                                <span class="mood-choice-subtitle">
+                                    Peaceful
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- EXCITED -->
+
+                        <label class="mood-choice">
+
+                            <input
+                                type="radio"
+                                name="mood"
+                                value="Excited"
+                            >
+
+                            <div class="mood-choice-content">
+
+                                <span class="mood-choice-emoji">
+                                    🤩
+                                </span>
+
+                                <span class="mood-choice-name">
+                                    Excited
+                                </span>
+
+                                <span class="mood-choice-subtitle">
+                                    Full of energy
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- OKAY -->
+
+                        <label class="mood-choice">
+
+                            <input
+                                type="radio"
+                                name="mood"
+                                value="Okay"
+                            >
+
+                            <div class="mood-choice-content">
+
+                                <span class="mood-choice-emoji">
+                                    🙂
+                                </span>
+
+                                <span class="mood-choice-name">
+                                    Okay
+                                </span>
+
+                                <span class="mood-choice-subtitle">
+                                    Just okay
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- SAD -->
+
+                        <label class="mood-choice">
+
+                            <input
+                                type="radio"
+                                name="mood"
+                                value="Sad"
+                            >
+
+                            <div class="mood-choice-content">
+
+                                <span class="mood-choice-emoji">
+                                    😔
+                                </span>
+
+                                <span class="mood-choice-name">
+                                    Sad
+                                </span>
+
+                                <span class="mood-choice-subtitle">
+                                    Feeling low
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- STRESSED -->
+
+                        <label class="mood-choice">
+
+                            <input
+                                type="radio"
+                                name="mood"
+                                value="Stressed"
+                            >
+
+                            <div class="mood-choice-content">
+
+                                <span class="mood-choice-emoji">
+                                    😣
+                                </span>
+
+                                <span class="mood-choice-name">
+                                    Stressed
+                                </span>
+
+                                <span class="mood-choice-subtitle">
+                                    Need a break
+                                </span>
+
+                            </div>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     NOTE
+                ================================================= -->
+
+                <div class="mood-form-section note-section">
+
+                    <div class="section-title">
+
+                        <i class="fa-regular fa-pen-to-square"></i>
+
+                        <span>Add a note</span>
+
+                        <small>(optional)</small>
+
+                    </div>
+
+
+                    <textarea
+                        id="note"
+                        name="note"
+                        class="mood-note-input"
+                        rows="5"
+                        maxlength="255"
+                        placeholder="What's on your mind today?"
+                    ></textarea>
+
+
+                    <div class="note-helper">
+
+                        <i class="fa-regular fa-lightbulb"></i>
+
+                        A short note can help you understand
+                        your feelings later.
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ACTION BUTTONS
+                ================================================= -->
+
+                <div class="mood-form-actions">
+
+                    <!-- Save Mood -->
+
+                    <button
+                        type="submit"
+                        class="mood-save-btn"
+                    >
+
+                        <i class="fa-solid fa-check"></i>
+
+                        Save Today's Mood
+
+                    </button>
+
+
+                    <!-- Mood History -->
+
+                    <a
+                        href="{{ url_for('mood_history') }}"
+                        class="mood-history-btn"
+                    >
+
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+
+                        View Mood History
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- =================================================
+             PRIVACY NOTE
+        ================================================= -->
+
+        <div class="mood-privacy-note">
+
+            <i class="fa-solid fa-lock"></i>
+
+            <span>
+                Your mood entries are private and connected
+                only to your MindMate account.
+            </span>
+
+        </div>
+
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+    // Sidebar elements
+    const sidebarToggle =
+        document.getElementById("sidebarToggle");
+
+    const sidebar =
+        document.getElementById("mindmateSidebar");
+
+    const overlay =
+        document.getElementById("sidebarOverlay");
+
+
+    // Open / close mobile sidebar
+    if (sidebarToggle) {
+
+        sidebarToggle.addEventListener("click", function () {
+
+            sidebar.classList.toggle("sidebar-open");
+
+            overlay.classList.toggle("overlay-active");
+
+        });
+
+    }
+
+
+    // Close sidebar when overlay is clicked
+    if (overlay) {
+
+        overlay.addEventListener("click", function () {
+
+            sidebar.classList.remove("sidebar-open");
+
+            overlay.classList.remove("overlay-active");
+
+        });
+
+    }
+
+
+    // Coming soon message
+    function comingSoon(event, featureName) {
+
+        event.preventDefault();
+
+        alert(featureName + " will be available soon.");
+
+    }
+
+</script>
+
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+></script>
+
+</body>
+
+</html>

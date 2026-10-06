@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>View Journal | MindMate</title>
+
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+
+    <!-- MindMate CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body class="dashboard-page view-journal-page">
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="mindmate-sidebar" id="mindmateSidebar">
+
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+            <i class="fa-solid fa-brain"></i>
+        </div>
+
+        <div>
+            <h2>MindMate</h2>
+            <span>Better Mind, Brighter You</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('mood') }}" class="sidebar-link">
+            <i class="fa-solid fa-face-smile"></i>
+            <span>Track Mood</span>
+        </a>
+
+        <a href="{{ url_for('journal') }}" class="sidebar-link">
+            <i class="fa-solid fa-book"></i>
+            <span>Journal</span>
+        </a>
+
+        <a href="{{ url_for('chat') }}" class="sidebar-link">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Support</span>
+        </a>
+
+        <a href="{{ url_for('resources') }}" class="sidebar-link">
+            <i class="fa-solid fa-heart"></i>
+            <span>Resources</span>
+        </a>
+
+        <a href="{{ url_for('counselor') }}" class="sidebar-link">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Counselor</span>
+        </a>
+
+        <a href="{{ url_for('sos') }}" class="sidebar-link sos-link">
+            <i class="fa-solid fa-life-ring"></i>
+            <span>SOS Support</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+</aside>
+
+
+
+<!-- =====================================================
+     MOBILE SIDEBAR OVERLAY
+===================================================== -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+    onclick="closeSidebar()"
+>
+</div>
+
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+
+<main class="dashboard-main view-journal-main">
+
+
+    <!-- =================================================
+         TOP BAR
+    ================================================= -->
+
+    <header class="dashboard-topbar">
+
+
+        <div class="topbar-left">
+
+
+            <!-- Mobile Menu -->
+
+            <button
+                class="sidebar-toggle"
+                id="sidebarToggle"
+                onclick="toggleSidebar()"
+                type="button"
+                aria-label="Open menu"
+            >
+
+                <i class="fa-solid fa-bars"></i>
+
+            </button>
+
+
+            <!-- Back -->
+
+            <button
+                class="back-button"
+                onclick="goBack()"
+                type="button"
+            >
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                <span>
+                    Back
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- Profile -->
+
+        <div class="topbar-right">
+
+            <div class="profile-mini">
+
+                <div class="profile-avatar">
+
+                    {{ session.get('student_name', 'Student')[0] | upper }}
+
+                </div>
+
+                <span>
+                    {{ session.get('student_name', 'Student') }}
+                </span>
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =================================================
+         PAGE CONTENT
+    ================================================= -->
+
+    <div class="view-journal-content-wrapper">
+
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================= -->
+
+        <section class="view-journal-header">
+
+
+            <div class="view-journal-header-icon">
+
+                <i class="fa-solid fa-book-open"></i>
+
+            </div>
+
+
+            <div>
+
+                <h1>
+                    Your Journal Entry
+                </h1>
+
+                <p>
+                    A private moment captured in your own words.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             JOURNAL CARD
+        ================================================= -->
+
+        <article class="view-journal-card">
+
+
+            <!-- =================================================
+                 TITLE + DATE
+            ================================================= -->
+
+            <div class="view-journal-title-section">
+
+
+                <div class="view-journal-entry-icon">
+
+                    <i class="fa-solid fa-book"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h2>
+
+                        {% if journal.title %}
+
+                            {{ journal.title }}
+
+                        {% else %}
+
+                            Untitled Journal
+
+                        {% endif %}
+
+                    </h2>
+
+
+                    <div class="view-journal-date">
+
+                        <i class="fa-regular fa-calendar"></i>
+
+                        {{ journal.created_at.strftime('%d %B %Y') }}
+
+                        <span>
+                            •
+                        </span>
+
+                        <i class="fa-regular fa-clock"></i>
+
+                        {{ journal.created_at.strftime('%I:%M %p') }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 JOURNAL CONTENT
+            ================================================= -->
+
+            <div class="view-journal-text">
+
+                {{ journal.content }}
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SENTIMENT ANALYSIS
+            ================================================= -->
+
+            <div class="journal-sentiment-box">
+
+
+                <div class="sentiment-label">
+
+                    <i class="fa-solid fa-heart"></i>
+
+                    Journal Sentiment
+
+                </div>
+
+
+
+                {% if journal.sentiment == "Positive" %}
+
+                    <div class="sentiment-result positive">
+
+                        <i class="fa-solid fa-face-smile"></i>
+
+                        <span>
+                            Positive
+                        </span>
+
+                    </div>
+
+
+                {% elif journal.sentiment == "Negative" %}
+
+                    <div class="sentiment-result negative">
+
+                        <i class="fa-solid fa-face-frown"></i>
+
+                        <span>
+                            Negative
+                        </span>
+
+                    </div>
+
+
+                {% elif journal.sentiment == "Neutral" %}
+
+                    <div class="sentiment-result neutral">
+
+                        <i class="fa-solid fa-face-meh"></i>
+
+                        <span>
+                            Neutral
+                        </span>
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="sentiment-result neutral">
+
+                        <i class="fa-solid fa-circle-info"></i>
+
+                        <span>
+                            Not analyzed
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+
+
+                {% if journal.sentiment_score is not none %}
+
+                    <div class="sentiment-score">
+
+                        Sentiment Score:
+
+                        <strong>
+                            {{ "%.2f"|format(journal.sentiment_score) }}
+                        </strong>
+
+                    </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 FOOTER
+            ================================================= -->
+
+            <div class="view-journal-footer">
+
+
+                <!-- PRIVATE LABEL -->
+
+                <div class="view-journal-private">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    Private Journal Entry
+
+                </div>
+
+
+
+                <!-- ACTIONS -->
+
+                <div class="view-journal-actions">
+
+
+                    <!-- EDIT -->
+
+                    <a
+                        href="{{ url_for('edit_journal', journal_id=journal.id) }}"
+                        class="edit-journal-btn"
+                    >
+
+                        <i class="fa-solid fa-pen"></i>
+
+                        Edit Journal
+
+                    </a>
+
+
+
+                    <!-- DELETE -->
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('delete_journal', journal_id=journal.id) }}"
+                        onsubmit="return confirm('Are you sure you want to delete this journal entry?');"
+                    >
+
+                        <button
+                            type="submit"
+                            class="delete-journal-btn"
+                        >
+
+                            <i class="fa-solid fa-trash"></i>
+
+                            Delete
+
+                        </button>
+
+                    </form>
+
+
+
+                    <!-- BACK TO HISTORY -->
+
+                    <a
+                        href="{{ url_for('journal_history') }}"
+                        class="back-history-btn"
+                    >
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Back to Journal History
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+
+        </article>
+
+
+
+        <!-- =================================================
+             PRIVACY NOTE
+        ================================================= -->
+
+        <div class="view-journal-privacy">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <span>
+                Your journal entries are private and visible only to you.
+            </span>
+
+        </div>
+
+
+    </div>
+
+</main>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+function toggleSidebar() {
+
+    const sidebar =
+        document.getElementById("mindmateSidebar");
+
+    const overlay =
+        document.getElementById("sidebarOverlay");
+
+
+    if (sidebar && overlay) {
+
+        sidebar.classList.toggle("sidebar-open");
+
+        overlay.classList.toggle("overlay-active");
+
+    }
+
+}
+
+
+
+function closeSidebar() {
+
+    const sidebar =
+        document.getElementById("mindmateSidebar");
+
+    const overlay =
+        document.getElementById("sidebarOverlay");
+
+
+    if (sidebar && overlay) {
+
+        sidebar.classList.remove("sidebar-open");
+
+        overlay.classList.remove("overlay-active");
+
+    }
+
+}
+
+
+
+/* =====================================================
+   CLOSE SIDEBAR ON MOBILE
+===================================================== */
+
+document.querySelectorAll(".sidebar-link").forEach(
+
+    function(link) {
+
+        link.addEventListener(
+
+            "click",
+
+            function() {
+
+                if (window.innerWidth <= 900) {
+
+                    closeSidebar();
+
+                }
+
+            }
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+function goBack() {
+
+    if (window.history.length > 1) {
+
+        window.history.back();
+
+    } else {
+
+        window.location.href =
+            "{{ url_for('journal_history') }}";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   COMING SOON
+===================================================== */
+
+function comingSoon(event, pageName) {
+
+    event.preventDefault();
+
+    alert(
+        pageName +
+        " will be available soon."
+    );
+
+}
+
+</script>
+
+
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+</body>
+
+</html>

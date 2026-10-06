@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Support - MindMate</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        /* =========================================================
+           AI SUPPORT PAGE
+           ========================================================= */
+
+        .chat-page .dashboard-content {
+            padding-bottom: 40px;
+        }
+
+        .chat-page .page-heading {
+            margin-bottom: 22px;
+            animation: chatFadeDown 0.45s ease-out;
+        }
+
+        .chat-page .page-heading h1 {
+            margin-bottom: 6px;
+        }
+
+        .chat-page .page-heading p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+
+        /* =========================================================
+           TOPBAR
+           ========================================================= */
+
+        .chat-page .dashboard-topbar {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .chat-page .topbar-profile {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-page .profile-avatar {
+            transition: all 0.25s ease;
+        }
+
+        .chat-page .profile-avatar:hover {
+            transform: scale(1.06);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.18);
+        }
+
+        .chat-page .profile-info {
+            text-align: right;
+        }
+
+        .chat-page .profile-info span {
+            display: block;
+            color: #9ca3af;
+            font-size: 9px;
+            line-height: 1.2;
+        }
+
+        .chat-page .profile-info strong {
+            display: block;
+            color: #1f2937;
+            font-size: 11.5px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .chat-page .back-btn {
+            margin-left: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 8px 13px;
+            border: 1px solid #e0e7ff;
+            border-radius: 9px;
+            background: #ffffff;
+            color: #4f46e5;
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chat-page .back-btn:hover {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            transform: translateX(-2px);
+        }
+
+        .chat-page .back-btn i {
+            font-size: 10px;
+        }
+
+
+        /* =========================================================
+           AI INTRO CARD
+           ========================================================= */
+
+        .ai-intro-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.06);
+            margin-bottom: 20px;
+            animation: chatFadeUp 0.5s ease-out;
+            transition: all 0.25s ease;
+        }
+
+        .ai-intro-card:hover {
+            transform: translateY(-2px);
+            border-color: #dbe1ff;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.09);
+        }
+
+        .ai-intro-icon {
+            width: 52px;
+            height: 52px;
+            min-width: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: #eef2ff;
+            color: #4f46e5;
+            font-size: 22px;
+            animation: aiIconFloat 3s ease-in-out infinite;
+        }
+
+        .ai-intro-content h3 {
+            margin: 0 0 5px;
+            color: #1f2937;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .ai-intro-content p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 12.5px;
+            line-height: 1.65;
+        }
+
+
+        /* =========================================================
+           CHAT CONTAINER
+           ========================================================= */
+
+        .chat-container {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.06);
+            overflow: hidden;
+            animation: chatContainerAppear 0.55s ease-out;
+        }
+
+
+        /* =========================================================
+           CHAT HEADER
+           ========================================================= */
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: #f8f8ff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .chat-bot-avatar {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: #ffffff;
+            font-size: 17px;
+            animation: botPulse 2.8s ease-in-out infinite;
+        }
+
+        .chat-header-info h3 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .chat-online {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 3px;
+            color: #6b7280;
+            font-size: 10.5px;
+        }
+
+        .chat-online span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+
+
+        /* =========================================================
+           CHAT BODY
+           ========================================================= */
+
+        .chat-body {
+            height: 420px;
+            padding: 20px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .chat-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chat-body::-webkit-scrollbar-track {
+            background: #f9fafb;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 10px;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb:hover {
+            background: #a5b4fc;
+        }
+
+
+        /* =========================================================
+           WELCOME MESSAGE
+           ========================================================= */
+
+        .welcome-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            animation: messageAppear 0.3s ease-out;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #eef2ff;
+            color: #4f46e5;
+            font-size: 13px;
+        }
+
+        .bot-message {
+            max-width: 78%;
+            padding: 11px 14px;
+            border-radius: 5px 13px 13px 13px;
+            background: #f3f4f6;
+            color: #374151;
+            font-size: 12px;
+            line-height: 1.65;
+            word-wrap: break-word;
+        }
+
+        .bot-message p {
+            margin: 0;
+            white-space: pre-line;
+        }
+
+
+        /* =========================================================
+           USER / BOT CHAT HISTORY
+           ========================================================= */
+
+        .message-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 16px;
+            animation: messageAppear 0.3s ease-out;
+        }
+
+        .message-row.user-row {
+            justify-content: flex-end;
+        }
+
+        .message-row.bot-row {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 78%;
+        }
+
+        .message-name {
+            margin-bottom: 4px;
+            color: #9ca3af;
+            font-size: 9px;
+            font-weight: 500;
+        }
+
+        .user-row .message-name {
+            text-align: right;
+        }
+
+        .user-message {
+            padding: 11px 14px;
+            border-radius: 13px 5px 13px 13px;
+            background: #4f46e5;
+            color: #ffffff;
+            font-size: 12px;
+            line-height: 1.65;
+            word-wrap: break-word;
+            white-space: pre-line;
+        }
+
+        .bot-row .message-avatar {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .bot-avatar {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .user-avatar {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+
+        /* =========================================================
+           CHAT INPUT
+           ========================================================= */
+
+        .chat-input-area {
+            padding: 15px 18px;
+            border-top: 1px solid #e5e7eb;
+            background: #ffffff;
+        }
+
+        .chat-form {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .chat-input-wrapper {
+            flex: 1;
+        }
+
+        .chat-input {
+            width: 100%;
+            min-height: 45px;
+            max-height: 100px;
+            resize: vertical;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            outline: none;
+            background: #ffffff;
+            color: #1f2937;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+            transition: all 0.25s ease;
+        }
+
+        .chat-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .chat-input:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10);
+            transform: translateY(-1px);
+        }
+
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            min-width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 10px;
+            background: #4f46e5;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .send-btn:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .send-btn:disabled {
+            background: #a5b4fc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .chat-disclaimer {
+            margin: 8px 2px 0;
+            color: #9ca3af;
+            font-size: 9.5px;
+            line-height: 1.5;
+        }
+
+
+        /* =========================================================
+           QUICK SUGGESTIONS
+           ========================================================= */
+
+        .quick-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 14px;
+        }
+
+        .quick-btn {
+            padding: 7px 11px;
+            border: 1px solid #dbe1ff;
+            border-radius: 20px;
+            background: #f8f8ff;
+            color: #4f46e5;
+            font-family: 'Poppins', sans-serif;
+            font-size: 10.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(79, 70, 229, 0.08);
+        }
+
+
+        /* =========================================================
+           ANIMATIONS
+           ========================================================= */
+
+        @keyframes chatFadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes chatFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes chatContainerAppear {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(7px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes aiIconFloat {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        @keyframes botPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.15);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(79, 70, 229, 0.05);
+            }
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+        @media (max-width: 700px) {
+
+            .chat-page .dashboard-topbar {
+                gap: 8px;
+            }
+
+            .chat-page .topbar-profile {
+                margin-left: auto;
+            }
+
+            .chat-page .profile-info {
+                display: none;
+            }
+
+            .chat-page .back-btn {
+                margin-left: 4px;
+                padding: 8px 10px;
+            }
+
+            .chat-page .back-btn span {
+                display: none;
+            }
+
+            .chat-page .back-btn i {
+                font-size: 11px;
+            }
+
+            .ai-intro-card {
+                padding: 17px;
+                gap: 12px;
+            }
+
+            .ai-intro-icon {
+                width: 46px;
+                height: 46px;
+                min-width: 46px;
+                font-size: 19px;
+            }
+
+            .ai-intro-content h3 {
+                font-size: 15px;
+            }
+
+            .ai-intro-content p {
+                font-size: 11.5px;
+            }
+
+            .chat-body {
+                height: 380px;
+                padding: 15px;
+            }
+
+            .chat-header {
+                padding: 14px 15px;
+            }
+
+            .chat-input-area {
+                padding: 12px;
+            }
+
+            .bot-message,
+            .user-message {
+                max-width: 86%;
+                font-size: 11.5px;
+            }
+
+            .message-content {
+                max-width: 86%;
+            }
+
+            .quick-suggestions {
+                gap: 5px;
+            }
+
+            .quick-btn {
+                font-size: 9.5px;
+                padding: 6px 9px;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body class="dashboard-page chat-page">
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside class="mindmate-sidebar" id="mindmateSidebar">
+
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+            <i class="fa-solid fa-brain"></i>
+        </div>
+
+        <div>
+            <h2>MindMate</h2>
+            <span>Better Mind, Brighter You</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('mood') }}" class="sidebar-link">
+            <i class="fa-solid fa-face-smile"></i>
+            <span>Track Mood</span>
+        </a>
+
+        <a href="{{ url_for('journal') }}" class="sidebar-link">
+            <i class="fa-solid fa-book"></i>
+            <span>Journal</span>
+        </a>
+
+        <a href="{{ url_for('chat') }}" class="sidebar-link">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Support</span>
+        </a>
+
+        <a href="{{ url_for('resources') }}" class="sidebar-link">
+            <i class="fa-solid fa-heart"></i>
+            <span>Resources</span>
+        </a>
+
+        <a href="{{ url_for('counselor') }}" class="sidebar-link">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Counselor</span>
+        </a>
+
+        <a href="{{ url_for('sos') }}" class="sidebar-link sos-link">
+            <i class="fa-solid fa-life-ring"></i>
+            <span>SOS Support</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+</aside>
+
+    <!-- MOBILE OVERLAY -->
+
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        onclick="closeSidebar()"
+    ></div>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
+    <main class="dashboard-main">
+
+
+        <!-- TOPBAR -->
+
+        <div class="dashboard-topbar">
+
+            <button
+                class="mobile-menu-btn"
+                type="button"
+                onclick="toggleSidebar()"
+                aria-label="Open menu"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+
+            <div class="topbar-profile">
+
+                <div class="profile-avatar">
+                    {{ session.get('student_name', 'Student')[0] | upper }}
+                </div>
+
+                <div class="profile-info">
+
+                    <span>Welcome</span>
+
+                    <strong>
+                        {{ session.get('student_name', 'Student') }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="back-btn"
+                type="button"
+                onclick="goBack()"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back</span>
+            </button>
+
+        </div>
+
+
+        <!-- PAGE CONTENT -->
+
+        <div class="dashboard-content">
+
+
+            <div class="page-heading">
+
+                <h1>AI Support</h1>
+
+                <p>
+                    Talk to MindMate whenever you need a little support,
+                    guidance or someone to listen.
+                </p>
+
+            </div>
+
+
+            <!-- AI INTRO -->
+
+            <div class="ai-intro-card">
+
+                <div class="ai-intro-icon">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+
+                <div class="ai-intro-content">
+
+                    <h3>
+                        Hi {{ session.get('student_name', 'Student') }}!
+                        I'm MindMate.
+                    </h3>
+
+                    <p>
+                        You can talk to me about studies, stress, daily
+                        challenges, motivation or anything that's on your mind.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- CHAT CONTAINER -->
+
+            <div class="chat-container">
+
+
+                <!-- CHAT HEADER -->
+
+                <div class="chat-header">
+
+                    <div class="chat-bot-avatar">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+
+                    <div class="chat-header-info">
+
+                        <h3>MindMate AI</h3>
+
+                        <div class="chat-online">
+                            <span></span>
+                            Ready to chat
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CHAT BODY -->
+
+                <div class="chat-body" id="chatBody">
+
+
+                    <!-- WELCOME MESSAGE -->
+
+                    <div class="welcome-message">
+
+                        <div class="message-avatar">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+
+                        <div class="bot-message">
+
+                            <p>
+                                Hello! I'm MindMate. 🌱
+                                I'm here to listen and support you.
+                                What's on your mind today?
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DATABASE CHAT HISTORY -->
+
+                    {% if chats %}
+
+                        {% for chat in chats %}
+
+
+                            <!-- USER MESSAGE -->
+
+                            <div class="message-row user-row">
+
+                                <div class="message-content">
+
+                                    <div class="message-name">
+                                        You
+                                    </div>
+
+                                    <div class="user-message">
+                                        {{ chat.user_message }}
+                                    </div>
+
+                                </div>
+
+                                <div class="message-avatar user-avatar">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+
+                            </div>
+
+
+                            <!-- MINDMATE RESPONSE -->
+
+                            <div class="message-row bot-row">
+
+                                <div class="message-avatar bot-avatar">
+                                    <i class="fa-solid fa-brain"></i>
+                                </div>
+
+                                <div class="message-content">
+
+                                    <div class="message-name">
+                                        MindMate
+                                    </div>
+
+                                    <div class="bot-message">
+                                        {{ chat.ai_reply }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        {% endfor %}
+
+                    {% endif %}
+
+
+                </div>
+
+
+                <!-- CHAT INPUT -->
+
+                <div class="chat-input-area">
+
+                    <form
+                        class="chat-form"
+                        id="chatForm"
+                        action="{{ url_for('send_message') }}"
+                        method="POST"
+                    >
+
+                        <div class="chat-input-wrapper">
+
+                            <textarea
+                                class="chat-input"
+                                id="messageInput"
+                                name="message"
+                                placeholder="Type your message here..."
+                                rows="1"
+                                maxlength="2000"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="send-btn"
+                            id="sendBtn"
+                            aria-label="Send message"
+                        >
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+
+                    </form>
+
+
+                    <!-- QUICK SUGGESTIONS -->
+
+                    <div class="quick-suggestions">
+
+                        <button
+                            type="button"
+                            class="quick-btn"
+                            onclick="setMessage('I feel stressed about my studies.')"
+                        >
+                            Study Stress
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="quick-btn"
+                            onclick="setMessage('I need some motivation today.')"
+                        >
+                            Motivation
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="quick-btn"
+                            onclick="setMessage('How can I take a relaxing break?')"
+                        >
+                            Relaxation
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="quick-btn"
+                            onclick="setMessage('I want to talk about something that is bothering me.')"
+                        >
+                            Talk to Me
+                        </button>
+
+                    </div>
+
+
+                    <p class="chat-disclaimer">
+                        MindMate provides general supportive guidance and is
+                        not a replacement for professional counseling.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+         ========================================================= -->
+
+    <script>
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById("mindmateSidebar");
+
+            const overlay =
+                document.getElementById("sidebarOverlay");
+
+            if (sidebar && overlay) {
+
+                sidebar.classList.toggle("sidebar-open");
+
+                overlay.classList.toggle("overlay-active");
+
+            }
+
+        }
+
+
+        function closeSidebar() {
+
+            const sidebar =
+                document.getElementById("mindmateSidebar");
+
+            const overlay =
+                document.getElementById("sidebarOverlay");
+
+            if (sidebar && overlay) {
+
+                sidebar.classList.remove("sidebar-open");
+
+                overlay.classList.remove("overlay-active");
+
+            }
+
+        }
+
+
+        document
+            .querySelectorAll(".sidebar-link")
+            .forEach(function(link) {
+
+                link.addEventListener("click", function() {
+
+                    if (window.innerWidth <= 900) {
+                        closeSidebar();
+                    }
+
+                });
+
+            });
+
+
+        function goBack() {
+
+            if (window.history.length > 1) {
+
+                window.history.back();
+
+            } else {
+
+                window.location.href =
+                    "{{ url_for('dashboard') }}";
+
+            }
+
+        }
+
+
+        function comingSoon(event, pageName) {
+
+            event.preventDefault();
+
+            alert(pageName + " will be available soon.");
+
+        }
+
+
+        function setMessage(message) {
+
+            const input =
+                document.getElementById("messageInput");
+
+            if (input) {
+
+                input.value = message;
+
+                input.focus();
+
+            }
+
+        }
+
+
+        const chatForm =
+            document.getElementById("chatForm");
+
+        const messageInput =
+            document.getElementById("messageInput");
+
+        const sendBtn =
+            document.getElementById("sendBtn");
+
+        const chatBody =
+            document.getElementById("chatBody");
+
+
+        if (chatForm) {
+
+            chatForm.addEventListener("submit", function(event) {
+
+                if (!messageInput.value.trim()) {
+
+                    event.preventDefault();
+
+                    return;
+
+                }
+
+                sendBtn.disabled = true;
+
+                sendBtn.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            });
+
+        }
+
+
+        if (messageInput) {
+
+            messageInput.addEventListener("keydown", function(event) {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    if (messageInput.value.trim()) {
+
+                        chatForm.requestSubmit();
+
+                    }
+
+                }
+
+            });
+
+        }
+
+
+        if (chatBody) {
+
+            chatBody.scrollTop =
+                chatBody.scrollHeight;
+
+        }
+
+    </script>
+
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+</body>
+
+</html>

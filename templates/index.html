@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MindMate - Your Mental Wellbeing Companion</title>
+
+
+    <!-- Bootstrap -->
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- Google Font -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- Font Awesome -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+
+    <!-- Custom CSS -->
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body class="landing-page">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="container mt-3">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+    <!-- =========================
+         NAVBAR
+    ========================== -->
+
+    <nav class="landing-navbar">
+
+        <div class="container">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+
+                <!-- Logo -->
+
+                <a
+                    href="{{ url_for('home') }}"
+                    class="landing-brand"
+                >
+
+                    <span class="landing-logo">
+
+                        <i class="fa-solid fa-brain"></i>
+
+                    </span>
+
+                    MindMate
+
+                </a>
+
+
+                <!-- Navigation -->
+
+                <div class="landing-nav-links">
+
+                    <a href="#features">
+                        Features
+                    </a>
+
+                    <a href="#how-it-works">
+                        How It Works
+                    </a>
+
+                    <a
+                        href="{{ url_for('login') }}"
+                        class="nav-login"
+                    >
+                        Login
+                    </a>
+
+                    <a
+                        href="{{ url_for('register') }}"
+                        class="nav-register"
+                    >
+                        Get Started
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =========================
+         HERO SECTION
+    ========================== -->
+
+    <section class="hero-section">
+
+        <div class="container">
+
+            <div class="row align-items-center">
+
+
+                <!-- Hero Text -->
+
+                <div class="col-lg-6">
+
+
+                    <div class="hero-badge">
+
+                        <i class="fa-solid fa-heart"></i>
+
+                        Built for Student Wellbeing
+
+                    </div>
+
+
+                    <h1>
+
+                        Your mind matters.
+
+                        <span>
+                            Let MindMate help.
+                        </span>
+
+                    </h1>
+
+
+                    <p class="hero-description">
+
+                        A student-friendly mental wellbeing platform
+                        to understand your emotions, track your mood,
+                        express your thoughts and find the right support.
+
+                    </p>
+
+
+                    <div class="hero-buttons">
+
+                        <a
+                            href="{{ url_for('register') }}"
+                            class="hero-primary-btn"
+                        >
+
+                            Get Started
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+
+
+                        <a
+                            href="{{ url_for('login') }}"
+                            class="hero-secondary-btn"
+                        >
+
+                            Login
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="hero-note">
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        A private space designed with students in mind.
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Hero Visual -->
+
+                <div class="col-lg-6">
+
+                    <div class="hero-visual">
+
+
+                        <div class="floating-card card-one">
+
+                            <div class="mini-icon mood-mini">
+
+                                <i class="fa-solid fa-face-smile"></i>
+
+                            </div>
+
+                            <div>
+
+                                <small>
+                                    Today's Mood
+                                </small>
+
+                                <strong>
+                                    Feeling Good 😊
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="brain-circle">
+
+                            <div class="brain-inner">
+
+                                <i class="fa-solid fa-brain"></i>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="floating-card card-two">
+
+                            <div class="mini-icon journal-mini">
+
+                                <i class="fa-solid fa-book-open"></i>
+
+                            </div>
+
+                            <div>
+
+                                <small>
+                                    Your Space
+                                </small>
+
+                                <strong>
+                                    Express Freely
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="floating-card card-three">
+
+                            <div class="mini-icon ai-mini">
+
+                                <i class="fa-solid fa-robot"></i>
+
+                            </div>
+
+                            <div>
+
+                                <small>
+                                    MindMate AI
+                                </small>
+
+                                <strong>
+                                    Always Here
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         FEATURES
+    ========================== -->
+
+    <section
+        class="features-section"
+        id="features"
+    >
+
+        <div class="container">
+
+
+            <div class="section-heading-center">
+
+                <span>
+                    WHY MINDMATE?
+                </span>
+
+                <h2>
+                    Everything you need for your wellbeing
+                </h2>
+
+                <p>
+                    Simple tools designed to help students
+                    understand and care for their mental wellbeing.
+                </p>
+
+            </div>
+
+
+
+            <div class="row g-4">
+
+
+                <!-- Mood -->
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="landing-feature-card">
+
+                        <div class="landing-feature-icon mood-feature">
+
+                            <i class="fa-solid fa-face-smile"></i>
+
+                        </div>
+
+                        <h4>
+                            Mood Tracking
+                        </h4>
+
+                        <p>
+                            Record your daily mood and
+                            understand how you feel over time.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Journal -->
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="landing-feature-card">
+
+                        <div class="landing-feature-icon journal-feature">
+
+                            <i class="fa-solid fa-book-open"></i>
+
+                        </div>
+
+                        <h4>
+                            Private Journal
+                        </h4>
+
+                        <p>
+                            Express your thoughts and
+                            keep your personal reflections in one place.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- AI -->
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="landing-feature-card">
+
+                        <div class="landing-feature-icon ai-feature">
+
+                            <i class="fa-solid fa-robot"></i>
+
+                        </div>
+
+                        <h4>
+                            MindMate AI
+                        </h4>
+
+                        <p>
+                            Have supportive conversations
+                            with your AI companion.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Support -->
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="landing-feature-card">
+
+                        <div class="landing-feature-icon support-feature">
+
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+
+                        </div>
+
+                        <h4>
+                            Find Support
+                        </h4>
+
+                        <p>
+                            Discover helpful resources and
+                            connect with counselor support.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         HOW IT WORKS
+    ========================== -->
+
+    <section
+        class="how-section"
+        id="how-it-works"
+    >
+
+        <div class="container">
+
+
+            <div class="section-heading-center">
+
+                <span>
+                    HOW IT WORKS
+                </span>
+
+                <h2>
+                    Your wellbeing journey, simplified
+                </h2>
+
+            </div>
+
+
+
+            <div class="row g-4 justify-content-center">
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="step-card">
+
+                        <div class="step-number">
+                            01
+                        </div>
+
+                        <i class="fa-solid fa-chart-simple"></i>
+
+                        <h4>
+                            Monitor
+                        </h4>
+
+                        <p>
+                            Track your mood and daily wellbeing.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="step-card">
+
+                        <div class="step-number">
+                            02
+                        </div>
+
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+
+                        <h4>
+                            Understand
+                        </h4>
+
+                        <p>
+                            Discover patterns in your emotions.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="step-card">
+
+                        <div class="step-number">
+                            03
+                        </div>
+
+                        <i class="fa-solid fa-heart"></i>
+
+                        <h4>
+                            Support
+                        </h4>
+
+                        <p>
+                            Use tools and AI support when needed.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="step-card">
+
+                        <div class="step-number">
+                            04
+                        </div>
+
+                        <i class="fa-solid fa-people-arrows"></i>
+
+                        <h4>
+                            Connect
+                        </h4>
+
+                        <p>
+                            Find resources and professional support.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         CTA
+    ========================== -->
+
+    <section class="landing-cta">
+
+        <div class="container">
+
+            <div class="cta-box">
+
+                <div class="cta-icon">
+
+                    <i class="fa-solid fa-brain"></i>
+
+                </div>
+
+
+                <h2>
+                    Your wellbeing deserves attention.
+                </h2>
+
+
+                <p>
+                    Start building a healthier relationship
+                    with your thoughts and emotions today.
+                </p>
+
+
+                <a
+                    href="{{ url_for('register') }}"
+                    class="cta-button"
+                >
+
+                    Create Your MindMate Account
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer class="landing-footer">
+
+        <div class="container">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <strong>
+                        <i class="fa-solid fa-brain me-2"></i>
+                        MindMate
+                    </strong>
+
+                    <span>
+                        — Your Mental Wellbeing Companion
+                    </span>
+
+                </div>
+
+
+                <p>
+                    © 2026 MindMate
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
