@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MindMate - Admin Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9ff;
+            color: #1f2937;
+        }
+
+        .admin-layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================== */
+
+        .admin-sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e7e8f2;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            padding: 25px 16px;
+            z-index: 1000;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 28px;
+        }
+
+        .admin-logo-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            background: #4f46e5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .admin-logo h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .admin-logo span {
+            display: block;
+            font-size: 9px;
+            color: #7b8191;
+            margin-top: 2px;
+        }
+
+        .admin-nav-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            padding: 0 12px;
+            margin-bottom: 10px;
+        }
+
+        .admin-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #626978;
+            padding: 12px 13px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .admin-nav a i {
+            width: 19px;
+            text-align: center;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav a.active {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .admin-sidebar-bottom {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 25px;
+        }
+
+        .admin-logout {
+            color: #dc2626 !important;
+        }
+
+        .admin-logout:hover {
+            background: #fef2f2 !important;
+            color: #dc2626 !important;
+        }
+
+        /* =========================
+           MAIN
+        ========================== */
+
+        .admin-main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+        }
+
+        .admin-topbar {
+            height: 76px;
+            background: #ffffff;
+            border-bottom: 1px solid #e7e8f2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .admin-topbar h1 {
+            font-size: 21px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .admin-topbar p {
+            margin: 3px 0 0;
+            font-size: 12px;
+            color: #8a909e;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-avatar {
+            width: 39px;
+            height: 39px;
+            border-radius: 50%;
+            background: #eef2ff;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .admin-profile-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .admin-profile-role {
+            display: block;
+            font-size: 10px;
+            color: #8a909e;
+        }
+
+        /* =========================
+           CONTENT
+        ========================== */
+
+        .admin-content {
+            padding: 30px 32px;
+        }
+
+        .welcome-box {
+            background: linear-gradient(
+                135deg,
+                #4f46e5,
+                #6366f1
+            );
+            color: white;
+            border-radius: 18px;
+            padding: 27px 30px;
+            margin-bottom: 25px;
+        }
+
+        .welcome-box h2 {
+            margin: 0 0 7px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .welcome-box p {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* =========================
+           STAT CARDS
+        ========================== */
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e8e9f3;
+            border-radius: 16px;
+            padding: 21px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 49px;
+            height: 49px;
+            border-radius: 13px;
+            background: #eef2ff;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            flex-shrink: 0;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .stat-card p {
+            margin: 3px 0 0;
+            font-size: 11px;
+            color: #8a909e;
+        }
+
+        /* =========================
+           QUICK ACTIONS
+        ========================== */
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 30px 0 15px;
+        }
+
+        .action-card {
+            background: white;
+            border: 1px solid #e8e9f3;
+            border-radius: 15px;
+            padding: 21px;
+            text-decoration: none;
+            color: #1f2937;
+            display: block;
+            height: 100%;
+            transition: 0.2s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            border-color: #c7c9f5;
+            box-shadow: 0 8px 22px rgba(31, 41, 55, 0.06);
+            color: #1f2937;
+        }
+
+        .action-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: #eef2ff;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 13px;
+        }
+
+        .action-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .action-card p {
+            font-size: 11px;
+            color: #8a909e;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        .admin-mobile-btn {
+            display: none;
+            border: none;
+            background: #eef2ff;
+            color: #4f46e5;
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 900px) {
+
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: 0.25s ease;
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .admin-topbar {
+                padding: 0 18px;
+            }
+
+            .admin-content {
+                padding: 22px 18px;
+            }
+
+            .admin-mobile-btn {
+                display: inline-flex;
+            }
+
+            .admin-profile-name,
+            .admin-profile-role {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="admin-sidebar" id="adminSidebar">
+
+        <div class="admin-logo">
+
+            <div class="admin-logo-icon">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+
+            <div>
+                <h2>MindMate</h2>
+                <span>Admin Panel</span>
+            </div>
+
+        </div>
+
+        <div class="admin-nav-title">
+            Management
+        </div>
+
+        <nav class="admin-nav">
+
+            <a
+                href="{{ url_for('admin_dashboard') }}"
+                class="active"
+            >
+                <i class="fa-solid fa-chart-line"></i>
+                Dashboard
+            </a>
+
+            <a href="#">
+                <i class="fa-solid fa-user-doctor"></i>
+                Counselors
+            </a>
+
+            <a href="#">
+                <i class="fa-solid fa-calendar-check"></i>
+                Appointments
+            </a>
+
+            <a href="#">
+                <i class="fa-solid fa-users"></i>
+                Students
+            </a>
+
+            <a href="#">
+                <i class="fa-solid fa-book-open"></i>
+                Resources
+            </a>
+
+        </nav>
+
+        <div class="admin-sidebar-bottom">
+
+            <a
+                href="{{ url_for('admin_logout') }}"
+                class="admin-nav admin-logout"
+                style="display:flex; align-items:center; gap:12px; text-decoration:none; padding:12px 13px; border-radius:10px; font-size:13px;"
+            >
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="admin-main">
+
+        <header class="admin-topbar">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <button
+                    class="admin-mobile-btn"
+                    onclick="toggleAdminSidebar()"
+                    type="button"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <p>Manage and monitor the MindMate platform.</p>
+                </div>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="admin-avatar">
+                    {{ admin_name[0] | upper }}
+                </div>
+
+                <div>
+                    <span class="admin-profile-name">
+                        {{ admin_name }}
+                    </span>
+
+                    <span class="admin-profile-role">
+                        Administrator
+                    </span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="admin-content">
+
+            <!-- Welcome -->
+
+            <div class="welcome-box">
+
+                <h2>
+                    Welcome, {{ admin_name }} 👋
+                </h2>
+
+                <p>
+                    Here's an overview of your MindMate administration panel.
+                </p>
+
+            </div>
+
+
+            <!-- Statistics -->
+
+            <div class="row g-4">
+
+                <!-- Counselors -->
+
+                <div class="col-6 col-lg-3">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                {{ total_counselors }}
+                            </h3>
+
+                            <p>
+                                Active Counselors
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Appointments -->
+
+                <div class="col-6 col-lg-3">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                {{ total_appointments }}
+                            </h3>
+
+                            <p>
+                                Appointments
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Students -->
+
+                <div class="col-6 col-lg-3">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                {{ total_students }}
+                            </h3>
+
+                            <p>
+                                Students
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Pending -->
+
+                <div class="col-6 col-lg-3">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                {{ pending_appointments }}
+                            </h3>
+
+                            <p>
+                                Pending Appointments
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Quick Actions -->
+
+            <h3 class="section-title">
+                Quick Management
+            </h3>
+
+
+            <div class="row g-4">
+
+                <!-- Counselors -->
+
+                <div class="col-md-6 col-lg-4">
+
+                    <a href="#" class="action-card">
+
+                        <div class="action-icon">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+
+                        <h4>
+                            Manage Counselors
+                        </h4>
+
+                        <p>
+                            Add, edit and manage counselor accounts and availability.
+                        </p>
+
+                    </a>
+
+                </div>
+
+
+                <!-- Appointments -->
+
+                <div class="col-md-6 col-lg-4">
+
+                    <a href="#" class="action-card">
+
+                        <div class="action-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+
+                        <h4>
+                            Manage Appointments
+                        </h4>
+
+                        <p>
+                            View and manage student counselor appointment requests.
+                        </p>
+
+                    </a>
+
+                </div>
+
+
+                <!-- Students -->
+
+                <div class="col-md-6 col-lg-4">
+
+                    <a href="#" class="action-card">
+
+                        <div class="action-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+
+                        <h4>
+                            Manage Students
+                        </h4>
+
+                        <p>
+                            View registered students and monitor platform activity.
+                        </p>
+
+                    </a>
+
+                </div>
+
+
+                <!-- Resources -->
+
+                <div class="col-md-6 col-lg-4">
+
+                    <a href="#" class="action-card">
+
+                        <div class="action-icon">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+
+                        <h4>
+                            Manage Resources
+                        </h4>
+
+                        <p>
+                            Manage wellbeing resources available to students.
+                        </p>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    function toggleAdminSidebar() {
+
+        const sidebar =
+            document.getElementById("adminSidebar");
+
+        if (sidebar) {
+            sidebar.classList.toggle("open");
+        }
+
+    }
+
+</script>
+
+</body>
+</html>

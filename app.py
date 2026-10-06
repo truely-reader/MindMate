@@ -1,10 +1,17 @@
-import os 
+import os
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+
 from google import genai
+
 import mysql.connector
+
 from mysql.connector import Error
+
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from textblob import TextBlob
+
 from datetime import date, timedelta
 
 from config import DB_CONFIG
@@ -13,6 +20,7 @@ from config import DB_CONFIG
 app = Flask(__name__)
 
 app.secret_key = "mindmate-secret-key"
+
 
 # =====================================================
 # GEMINI AI CONFIGURATION
@@ -24,26 +32,35 @@ gemini_client = None
 
 if GEMINI_API_KEY:
     gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-# =========================================================
+
+
+# =====================================================
+# ADMIN SECRET KEY
+# =====================================================
+
+ADMIN_SECRET = os.getenv("MINDMATE_ADMIN_KEY")
+
+
+# =====================================================
 # DATABASE CONNECTION
-# =========================================================
+# =====================================================
 
 def get_db_connection():
     return mysql.connector.connect(**DB_CONFIG)
 
 
-# =========================================================
+# =====================================================
 # HOME
-# =========================================================
+# =====================================================
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# =========================================================
+# =====================================================
 # REGISTER
-# =========================================================
+# =====================================================
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -62,6 +79,7 @@ def register():
         password = request.form["password"]
 
         # Required field validation
+
         if (
             not full_name
             or not age
@@ -73,26 +91,34 @@ def register():
             or not email
             or not password
         ):
+
             flash(
                 "Please fill in all required fields.",
                 "danger"
             )
+
             return redirect(url_for("register"))
 
         # Password validation
+
         if len(password) < 6:
+
             flash(
                 "Password must contain at least 6 characters.",
                 "danger"
             )
+
             return redirect(url_for("register"))
 
         # Age validation
+
         if not age.isdigit() or int(age) < 13 or int(age) > 100:
+
             flash(
                 "Please enter a valid age.",
                 "danger"
             )
+
             return redirect(url_for("register"))
 
         db = None
@@ -104,6 +130,7 @@ def register():
             cursor = db.cursor()
 
             # Check if email already exists
+
             cursor.execute(
                 """
                 SELECT id
@@ -125,9 +152,11 @@ def register():
                 return redirect(url_for("register"))
 
             # Hash password
+
             hashed_password = generate_password_hash(password)
 
             # Insert student
+
             cursor.execute(
                 """
                 INSERT INTO students
@@ -203,9 +232,9 @@ def register():
     return render_template("register.html")
 
 
-# =========================================================
+# =====================================================
 # LOGIN
-# =========================================================
+# =====================================================
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -248,6 +277,7 @@ def login():
             student = cursor.fetchone()
 
             # Verify password
+
             if student and check_password_hash(
                 student["password"],
                 password
@@ -293,9 +323,9 @@ def login():
     return render_template("login.html")
 
 
-# =========================================================
+# =====================================================
 # DASHBOARD
-# =========================================================
+# =====================================================
 
 @app.route("/dashboard")
 def dashboard():
@@ -417,12 +447,10 @@ def dashboard():
             negative_percentage = 0
 
         mood_percentages = {
-
             "positive": positive_percentage,
             "neutral": neutral_percentage,
             "negative": negative_percentage,
             "total": total_moods
-
         }
 
         # =====================================================
@@ -523,9 +551,9 @@ def dashboard():
             db.close()
 
 
-# =========================================================
+# =====================================================
 # LOGOUT
-# =========================================================
+# =====================================================
 
 @app.route("/logout")
 def logout():
@@ -540,9 +568,9 @@ def logout():
     return redirect(url_for("home"))
 
 
-# =========================================================
+# =====================================================
 # DAILY MOOD TRACKER
-# =========================================================
+# =====================================================
 
 @app.route("/mood", methods=["GET", "POST"])
 def mood():
@@ -640,9 +668,9 @@ def mood():
     )
 
 
-# =========================================================
+# =====================================================
 # MOOD HISTORY
-# =========================================================
+# =====================================================
 
 @app.route("/mood-history")
 def mood_history():
@@ -708,9 +736,9 @@ def mood_history():
             db.close()
 
 
-# =========================================================
+# =====================================================
 # MOOD ANALYTICS
-# =========================================================
+# =====================================================
 
 @app.route("/mood-analytics")
 def mood_analytics():
@@ -773,692 +801,632 @@ def mood_analytics():
         if db and db.is_connected():
             db.close()
 
-
-# =========================================================
+  # ============================================================
 # JOURNAL
-# =========================================================
+# ============================================================
 
 @app.route("/journal", methods=["GET", "POST"])
 def journal():
 
     if "student_id" not in session:
-
-        flash(
-            "Please login first.",
-            "warning"
-        )
-
         return redirect(url_for("login"))
 
     if request.method == "POST":
 
-        title = request.form["title"].strip()
-        content = request.form["content"].strip()
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
 
-        # Basic validation
-        if not content:
-
-            flash(
-                "Please write something in your journal.",
-                "danger"
-            )
-
+        if not title or not content:
+            flash("Please enter both title and journal content.", "danger")
             return redirect(url_for("journal"))
 
-        # =====================================================
-        # TEXTBLOB SENTIMENT ANALYSIS
-        # =====================================================
+        # Sentiment analysis
+        blob = TextBlob(content)
+        polarity = blob.sentiment.polarity
 
-        analysis = TextBlob(content)
-
-        sentiment_score = round(
-            analysis.sentiment.polarity,
-            2
-        )
-
-        if sentiment_score > 0.1:
-
+        if polarity > 0.1:
             sentiment = "Positive"
-
-        elif sentiment_score < -0.1:
-
+        elif polarity < -0.1:
             sentiment = "Negative"
-
         else:
-
             sentiment = "Neutral"
 
-        # =====================================================
-        # DATABASE
-        # =====================================================
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-        db = None
-        cursor = None
-
-        try:
-
-            db = get_db_connection()
-            cursor = db.cursor()
-
-            cursor.execute(
-                """
-                INSERT INTO journals
-                (
-                    student_id,
-                    title,
-                    content,
-                    sentiment,
-                    sentiment_score
-                )
-                VALUES
-                (
-                    %s,
-                    %s,
-                    %s,
-                    %s,
-                    %s
-                )
-                """,
-                (
-                    session["student_id"],
-                    title,
-                    content,
-                    sentiment,
-                    sentiment_score
-                )
+        cursor.execute(
+            """
+            INSERT INTO journals
+            (student_id, title, content, sentiment, sentiment_score)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (
+                session["student_id"],
+                title,
+                content,
+                sentiment,
+                polarity
             )
-
-            db.commit()
-
-            flash(
-                "Your journal entry has been saved successfully! 💜",
-                "success"
-            )
-
-            return redirect(url_for("journal"))
-
-        except Error as err:
-
-            if db:
-                db.rollback()
-
-            flash(
-                f"Database error: {err}",
-                "danger"
-            )
-
-            return redirect(url_for("journal"))
-
-        finally:
-
-            if cursor:
-                cursor.close()
-
-            if db and db.is_connected():
-                db.close()
-
-    return render_template(
-        "journal.html",
-        student_name=session.get(
-            "student_name",
-            "Student"
         )
-    )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        flash("Your journal has been saved privately.", "success")
+        return redirect(url_for("journal_history"))
+
+    return render_template("journal.html")
 
 
-# =========================================================
+# ============================================================
 # JOURNAL HISTORY
-# =========================================================
+# ============================================================
 
 @app.route("/journal-history")
 def journal_history():
 
     if "student_id" not in session:
-
-        flash(
-            "Please login first.",
-            "warning"
-        )
-
         return redirect(url_for("login"))
 
-    db = None
-    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    try:
+    cursor.execute(
+        """
+        SELECT *
+        FROM journals
+        WHERE student_id = %s
+        ORDER BY created_at DESC
+        """,
+        (session["student_id"],)
+    )
 
-        db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
+    journals = cursor.fetchall()
 
-        cursor.execute(
-            """
-            SELECT
-                id,
-                title,
-                content,
-                sentiment,
-                sentiment_score,
-                created_at
-            FROM journals
-            WHERE student_id = %s
-            ORDER BY created_at DESC
-            """,
-            (session["student_id"],)
-        )
+    cursor.close()
+    conn.close()
 
-        journals = cursor.fetchall()
-
-        return render_template(
-            "journal_history.html",
-            journals=journals,
-            student_name=session.get(
-                "student_name",
-                "Student"
-            )
-        )
-
-    except Error as err:
-
-        flash(
-            f"Database error: {err}",
-            "danger"
-        )
-
-        return redirect(url_for("journal"))
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if db and db.is_connected():
-            db.close()
+    return render_template(
+        "journal_history.html",
+        journals=journals
+    )
 
 
-# =========================================================
+# ============================================================
 # RESOURCES
-# =========================================================
+# ============================================================
 
 @app.route("/resources")
 def resources():
 
     if "student_id" not in session:
-
-        flash(
-            "Please login first.",
-            "warning"
-        )
-
         return redirect(url_for("login"))
 
-    db = None
-    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    try:
+    cursor.execute(
+        """
+        SELECT id, title, description, category, link
+        FROM resources
+        ORDER BY id DESC
+        """
+    )
 
-        db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
+    resources_data = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "resources.html",
+        resources=resources_data
+    )
+
+
+# ============================================================
+# ADMIN LOGIN
+# ============================================================
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+
+    if request.method == "POST":
+
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        secret_key = request.form.get("secret_key", "").strip()
+
+        # Check all three fields
+        if not email or not password or not secret_key:
+            flash(
+                "Please enter your email, password and admin secret key.",
+                "danger"
+            )
+            return redirect(url_for("admin_login"))
+
+        # Check admin secret key
+        if not ADMIN_SECRET or secret_key != ADMIN_SECRET:
+            flash(
+                "Invalid admin secret key.",
+                "danger"
+            )
+            return redirect(url_for("admin_login"))
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
         cursor.execute(
             """
-            SELECT
-                id,
-                title,
-                description,
-                category,
-                link
-            FROM resources
-            ORDER BY id ASC
+            SELECT *
+            FROM admins
+            WHERE email = %s
+            LIMIT 1
+            """,
+            (email,)
+        )
+
+        admin = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if not admin:
+            flash("Invalid admin email or password.", "danger")
+            return redirect(url_for("admin_login"))
+
+        # Check admin account status
+        if admin["status"] != "Active":
+            flash(
+                "This admin account is currently inactive.",
+                "danger"
+            )
+            return redirect(url_for("admin_login"))
+
+        # Check password
+        if not check_password_hash(
+            admin["password"],
+            password
+        ):
+            flash("Invalid admin email or password.", "danger")
+            return redirect(url_for("admin_login"))
+
+        # Admin session
+        session.clear()
+
+        session["admin_id"] = admin["id"]
+        session["admin_name"] = admin["full_name"]
+        session["admin_email"] = admin["email"]
+
+        flash("Admin login successful.", "success")
+
+        return redirect(url_for("admin_dashboard"))
+
+    return render_template("admin_login.html")
+
+
+# ============================================================
+# ADMIN DASHBOARD
+# ============================================================
+
+@app.route("/admin/dashboard")
+def admin_dashboard():
+
+    if "admin_id" not in session:
+        return redirect(url_for("admin_login"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Total students
+        cursor.execute("SELECT COUNT(*) AS total FROM students")
+        total_students = cursor.fetchone()["total"]
+
+        # Total counselors
+        # Currently counselor profiles are dummy/static,
+        # so we will set this properly when counselor management is created.
+        total_counselors = 3
+
+        # Total appointments
+        cursor.execute(
+            "SELECT COUNT(*) AS total FROM counselor_bookings"
+        )
+        total_appointments = cursor.fetchone()["total"]
+
+        # Pending appointments
+        cursor.execute(
+            """
+            SELECT COUNT(*) AS total
+            FROM counselor_bookings
+            WHERE status = 'Pending'
             """
         )
-
-        resources = cursor.fetchall()
+        pending_appointments = cursor.fetchone()["total"]
 
         return render_template(
-            "resources.html",
-            resources=resources,
-            student_name=session.get(
-                "student_name",
-                "Student"
-            )
+            "admin_dashboard.html",
+            admin_name=session.get("admin_name", "Admin"),
+            total_students=total_students,
+            total_counselors=total_counselors,
+            total_appointments=total_appointments,
+            pending_appointments=pending_appointments
         )
 
-    except Error as err:
+    except Error as e:
+        print("Admin Dashboard Error:", e)
 
         flash(
-            f"Database error: {err}",
+            "Unable to load dashboard statistics.",
             "danger"
         )
 
-        return redirect(url_for("dashboard"))
+        return render_template(
+            "admin_dashboard.html",
+            admin_name=session.get("admin_name", "Admin"),
+            total_students=0,
+            total_counselors=0,
+            total_appointments=0,
+            pending_appointments=0
+        )
 
     finally:
+        cursor.close()
+        conn.close()
 
-        if cursor:
-            cursor.close()
 
-        if db and db.is_connected():
-            db.close()
+# ============================================================
+# ADMIN LOGOUT
+# ============================================================
 
-@app.route('/counselor')
+@app.route("/admin/logout")
+def admin_logout():
+
+    session.pop("admin_id", None)
+    session.pop("admin_name", None)
+    session.pop("admin_email", None)
+
+    flash("Admin logged out successfully.", "success")
+
+    return redirect(url_for("admin_login"))
+
+
+# ============================================================
+# COUNSELOR PAGE
+# ============================================================
+
+@app.route("/counselor")
 def counselor():
-    return render_template('counselor.html')
 
-# =========================================================
-# COUNSELOR - MY BOOKINGS
-# =========================================================
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
-@app.route('/my_bookings')
+    # Temporary dummy counselor profiles.
+    # Later these will come from the counselor/admin system.
+
+    counselors = [
+        {
+            "name": "Dr. Ananya Sharma",
+            "specialization": "Student & Mental Wellness Counselor",
+            "availability": "Mon-Fri, 10 AM-2 PM"
+        },
+        {
+            "name": "Dr. Riya Mehta",
+            "specialization": "Emotional Wellness Counselor",
+            "availability": "Mon-Thu, 2 PM-6 PM"
+        },
+        {
+            "name": "Dr. Neha Patil",
+            "specialization": "Academic & Stress Counselor",
+            "availability": "Tue-Sat, 11 AM-4 PM"
+        }
+    ]
+
+    return render_template(
+        "counselor.html",
+        counselors=counselors
+    )
+
+
+# ============================================================
+# MY BOOKINGS
+# ============================================================
+
+@app.route("/my_bookings")
 def my_bookings():
 
-    if 'student_email' not in session:
-        return redirect(url_for('login'))
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
-    student_email = session['student_email']
+    student_email = session.get("student_email")
 
-    db = None
-    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    try:
+    cursor.execute(
+        """
+        SELECT *
+        FROM counselor_bookings
+        WHERE student_email = %s
+        ORDER BY appointment_date DESC, appointment_time DESC
+        """,
+        (student_email,)
+    )
 
-        db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
+    bookings = cursor.fetchall()
 
-        cursor.execute("""
-            SELECT
-                id,
-                counselor_name,
-                appointment_date,
-                appointment_time,
-                reason,
-                status,
-                created_at
-            FROM counselor_bookings
-            WHERE student_email = %s
-            ORDER BY appointment_date DESC, appointment_time DESC
-        """, (student_email,))
+    cursor.close()
+    conn.close()
 
-        bookings = cursor.fetchall()
-
-        return render_template(
-            'my_bookings.html',
-            bookings=bookings
-        )
-
-    except Error as err:
-
-        print("MY BOOKINGS ERROR:", err)
-
-        flash(
-            "Unable to load your bookings right now.",
-            "danger"
-        )
-
-        return redirect(url_for('counselor'))
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if db and db.is_connected():
-            db.close()
+    return render_template(
+        "my_bookings.html",
+        bookings=bookings
+    )
 
 
-# =========================================================
-# COUNSELOR - BOOK APPOINTMENT
-# =========================================================
+# ============================================================
+# BOOK COUNSELOR
+# ============================================================
 
-@app.route('/book_counselor', methods=['POST'])
+@app.route("/book_counselor", methods=["POST"])
 def book_counselor():
 
-    if 'student_email' not in session:
-        return redirect(url_for('login'))
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
-    student_email = session['student_email']
+    counselor_name = request.form.get(
+        "counselor_name",
+        ""
+    ).strip()
 
-    counselor_name = request.form.get('counselor_name')
-    appointment_date = request.form.get('appointment_date')
-    appointment_time = request.form.get('appointment_time')
-    reason = request.form.get('reason')
+    appointment_date = request.form.get(
+        "appointment_date",
+        ""
+    ).strip()
 
-    # Basic validation
+    appointment_time = request.form.get(
+        "appointment_time",
+        ""
+    ).strip()
+
+    reason = request.form.get(
+        "reason",
+        ""
+    ).strip()
+
     if not counselor_name or not appointment_date or not appointment_time:
-
         flash(
-            "Please fill all required appointment details.",
+            "Please select counselor, date and time.",
             "danger"
         )
+        return redirect(url_for("counselor"))
 
-        return redirect(url_for('counselor'))
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-    db = None
-    cursor = None
-
-    try:
-
-        db = get_db_connection()
-        cursor = db.cursor()
-
-        cursor.execute("""
-            INSERT INTO counselor_bookings
-            (
-                student_email,
-                counselor_name,
-                appointment_date,
-                appointment_time,
-                reason,
-                status
-            )
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (
+    cursor.execute(
+        """
+        INSERT INTO counselor_bookings
+        (
             student_email,
             counselor_name,
             appointment_date,
             appointment_time,
-            reason or '',
-            'Pending'
-        ))
-
-        db.commit()
-
-        flash(
-            "Your appointment request has been submitted successfully.",
-            "success"
+            reason,
+            status
         )
-
-    except Error as err:
-
-        print("COUNSELOR BOOKING ERROR:", err)
-
-        if db:
-            db.rollback()
-
-        flash(
-            "Something went wrong while submitting your appointment request.",
-            "danger"
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """,
+        (
+            session["student_email"],
+            counselor_name,
+            appointment_date,
+            appointment_time,
+            reason,
+            "Pending"
         )
+    )
 
-    finally:
+    conn.commit()
 
-        if cursor:
-            cursor.close()
+    cursor.close()
+    conn.close()
 
-        if db and db.is_connected():
-            db.close()
+    flash(
+        "Counselor appointment request submitted successfully.",
+        "success"
+    )
 
-    return redirect(url_for('counselor'))
+    return redirect(url_for("my_bookings"))
 
-#----------SOS HELP-----------------#
 
-@app.route('/sos')
+# ============================================================
+# SOS SUPPORT
+# ============================================================
+
+@app.route("/sos")
 def sos():
 
-    if 'student_id' not in session:
-        return redirect(url_for('login'))
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
-    student_email = session.get('student_email')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    db = None
-    cursor = None
-    contacts = []
+    cursor.execute(
+        """
+        SELECT *
+        FROM emergency_contacts
+        WHERE student_email = %s
+        ORDER BY created_at DESC
+        """,
+        (session["student_email"],)
+    )
 
-    try:
+    contacts = cursor.fetchall()
 
-        db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT
-                id,
-                contact_name,
-                relationship,
-                phone
-            FROM emergency_contacts
-            WHERE student_email = %s
-            ORDER BY id DESC
-        """, (student_email,))
-
-        contacts = cursor.fetchall()
-
-    except Error as err:
-
-        print("SOS CONTACT ERROR:", err)
-
-        flash(
-            "Unable to load your trusted contacts right now.",
-            "danger"
-        )
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if db and db.is_connected():
-            db.close()
+    cursor.close()
+    conn.close()
 
     return render_template(
-        'sos.html',
+        "sos.html",
         contacts=contacts
     )
 
-@app.route('/save_emergency_contact', methods=['POST'])
+
+# ============================================================
+# SAVE EMERGENCY CONTACT
+# ============================================================
+
+@app.route("/save_emergency_contact", methods=["POST"])
 def save_emergency_contact():
 
-    if 'student_email' not in session:
-        return redirect(url_for('login'))
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
-    student_email = session['student_email']
+    contact_name = request.form.get(
+        "contact_name",
+        ""
+    ).strip()
 
-    contact_name = request.form.get('contact_name', '').strip()
-    relationship = request.form.get('relationship', '').strip()
-    phone = request.form.get('phone', '').strip()
+    relationship = request.form.get(
+        "relationship",
+        ""
+    ).strip()
+
+    phone = request.form.get(
+        "phone",
+        ""
+    ).strip()
 
     if not contact_name or not relationship or not phone:
         flash(
             "Please fill all emergency contact details.",
             "danger"
         )
-        return redirect(url_for('sos'))
+        return redirect(url_for("sos"))
 
-    db = None
-    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-    try:
-        db = get_db_connection()
-        cursor = db.cursor()
-
-        cursor.execute("""
-            INSERT INTO emergency_contacts
-            (
-                student_email,
-                contact_name,
-                relationship,
-                phone
-            )
-            VALUES (%s, %s, %s, %s)
-        """, (
+    cursor.execute(
+        """
+        INSERT INTO emergency_contacts
+        (
             student_email,
             contact_name,
             relationship,
             phone
-        ))
-
-        db.commit()
-
-        flash(
-            "Trusted contact saved successfully.",
-            "success"
         )
-
-    except Error as err:
-
-        print("EMERGENCY CONTACT ERROR:", err)
-
-        if db:
-            db.rollback()
-
-        flash(
-            "Unable to save the contact right now.",
-            "danger"
+        VALUES (%s, %s, %s, %s)
+        """,
+        (
+            session["student_email"],
+            contact_name,
+            relationship,
+            phone
         )
+    )
 
-    finally:
+    conn.commit()
 
-        if cursor:
-            cursor.close()
+    cursor.close()
+    conn.close()
 
-        if db and db.is_connected():
-            db.close()
+    flash(
+        "Emergency contact saved successfully.",
+        "success"
+    )
 
-    return redirect(url_for('sos'))
+    return redirect(url_for("sos"))
 
 
-@app.route('/delete_emergency_contact/<int:contact_id>', methods=['POST'])
+# ============================================================
+# DELETE EMERGENCY CONTACT
+# ============================================================
+
+@app.route(
+    "/delete_emergency_contact/<int:contact_id>",
+    methods=["POST"]
+)
 def delete_emergency_contact(contact_id):
 
-    if 'student_email' not in session:
-        return redirect(url_for('login'))
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
-    student_email = session['student_email']
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-    db = None
-    cursor = None
-
-    try:
-
-        db = get_db_connection()
-        cursor = db.cursor()
-
-        cursor.execute("""
-            DELETE FROM emergency_contacts
-            WHERE id = %s
-            AND student_email = %s
-        """, (
+    cursor.execute(
+        """
+        DELETE FROM emergency_contacts
+        WHERE id = %s
+        AND student_email = %s
+        """,
+        (
             contact_id,
-            student_email
-        ))
-
-        db.commit()
-
-        flash(
-            "Trusted contact removed successfully.",
-            "success"
+            session["student_email"]
         )
+    )
 
-    except Error as err:
+    conn.commit()
 
-        print("DELETE EMERGENCY CONTACT ERROR:", err)
+    cursor.close()
+    conn.close()
 
-        if db:
-            db.rollback()
+    flash(
+        "Emergency contact deleted successfully.",
+        "success"
+    )
 
-        flash(
-            "Unable to remove the contact right now.",
-            "danger"
-        )
+    return redirect(url_for("sos"))
 
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if db and db.is_connected():
-            db.close()
-
-    return redirect(url_for('sos'))
-
-# =========================================================
+          # ============================================================
 # VIEW JOURNAL
-# =========================================================
+# ============================================================
 
 @app.route("/journal/<int:journal_id>")
 def view_journal(journal_id):
 
-    # FIXED:
-    # Previously this condition was accidentally reversed.
     if "student_id" not in session:
-
-        flash(
-            "Please login first.",
-            "warning"
-        )
-
         return redirect(url_for("login"))
 
-    db = None
-    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    try:
-
-        db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
-
-        cursor.execute(
-            """
-            SELECT
-                id,
-                title,
-                content,
-                sentiment,
-                sentiment_score,
-                created_at
-            FROM journals
-            WHERE id = %s
-            AND student_id = %s
-            """,
-            (
-                journal_id,
-                session["student_id"]
-            )
+    cursor.execute(
+        """
+        SELECT *
+        FROM journals
+        WHERE id = %s
+        AND student_id = %s
+        LIMIT 1
+        """,
+        (
+            journal_id,
+            session["student_id"]
         )
+    )
 
-        journal_entry = cursor.fetchone()
+    journal_data = cursor.fetchone()
 
-        if not journal_entry:
+    cursor.close()
+    conn.close()
 
-            flash(
-                "Journal entry not found.",
-                "danger"
-            )
+    if not journal_data:
+        flash("Journal entry not found.", "danger")
+        return redirect(url_for("journal_history"))
 
-            return redirect(
-                url_for("journal_history")
-            )
-
-        return render_template(
-            "view_journal.html",
-            journal=journal_entry,
-            student_name=session.get(
-                "student_name",
-                "Student"
-            )
-        )
-
-    except Error as err:
-
-        flash(
-            f"Database error: {err}",
-            "danger"
-        )
-
-        return redirect(
-            url_for("journal_history")
-        )
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if db and db.is_connected():
-            db.close()
+    return render_template(
+        "view_journal.html",
+        journal=journal_data
+    )
 
 
-# =========================================================
+# ============================================================
 # EDIT JOURNAL
-# =========================================================
+# ============================================================
 
 @app.route(
     "/journal/<int:journal_id>/edit",
@@ -1467,239 +1435,104 @@ def view_journal(journal_id):
 def edit_journal(journal_id):
 
     if "student_id" not in session:
-
-        flash(
-            "Please login first.",
-            "warning"
-        )
-
         return redirect(url_for("login"))
 
-    db = None
-    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    try:
-
-        db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
-
-        # Get existing journal
-        cursor.execute(
-            """
-            SELECT
-                id,
-                title,
-                content,
-                sentiment,
-                sentiment_score,
-                created_at
-            FROM journals
-            WHERE id = %s
-            AND student_id = %s
-            """,
-            (
-                journal_id,
-                session["student_id"]
-            )
+    # Get journal
+    cursor.execute(
+        """
+        SELECT *
+        FROM journals
+        WHERE id = %s
+        AND student_id = %s
+        LIMIT 1
+        """,
+        (
+            journal_id,
+            session["student_id"]
         )
+    )
 
-        journal_entry = cursor.fetchone()
+    journal_data = cursor.fetchone()
 
-        if not journal_entry:
+    if not journal_data:
+        cursor.close()
+        conn.close()
+
+        flash("Journal entry not found.", "danger")
+        return redirect(url_for("journal_history"))
+
+    # Update journal
+    if request.method == "POST":
+
+        title = request.form.get(
+            "title",
+            ""
+        ).strip()
+
+        content = request.form.get(
+            "content",
+            ""
+        ).strip()
+
+        if not title or not content:
+            cursor.close()
+            conn.close()
 
             flash(
-                "Journal entry not found.",
+                "Title and journal content are required.",
                 "danger"
-            )
-
-            return redirect(
-                url_for("journal_history")
-            )
-
-        # =====================================================
-        # UPDATE JOURNAL
-        # =====================================================
-
-        if request.method == "POST":
-
-            title = request.form["title"].strip()
-            content = request.form["content"].strip()
-
-            if not content:
-
-                flash(
-                    "Journal content cannot be empty.",
-                    "danger"
-                )
-
-                return redirect(
-                    url_for(
-                        "edit_journal",
-                        journal_id=journal_id
-                    )
-                )
-
-            # =================================================
-            # TEXTBLOB SENTIMENT ANALYSIS
-            # =================================================
-
-            analysis = TextBlob(content)
-
-            sentiment_score = round(
-                analysis.sentiment.polarity,
-                2
-            )
-
-            if sentiment_score > 0.1:
-
-                sentiment = "Positive"
-
-            elif sentiment_score < -0.1:
-
-                sentiment = "Negative"
-
-            else:
-
-                sentiment = "Neutral"
-
-            # =================================================
-            # UPDATE DATABASE
-            # =================================================
-
-            cursor.execute(
-                """
-                UPDATE journals
-                SET
-                    title = %s,
-                    content = %s,
-                    sentiment = %s,
-                    sentiment_score = %s
-                WHERE id = %s
-                AND student_id = %s
-                """,
-                (
-                    title,
-                    content,
-                    sentiment,
-                    sentiment_score,
-                    journal_id,
-                    session["student_id"]
-                )
-            )
-
-            db.commit()
-
-            flash(
-                "Your journal entry has been updated successfully! 💜",
-                "success"
             )
 
             return redirect(
                 url_for(
-                    "view_journal",
+                    "edit_journal",
                     journal_id=journal_id
                 )
             )
 
-        return render_template(
-            "edit_journal.html",
-            journal=journal_entry,
-            student_name=session.get(
-                "student_name",
-                "Student"
-            )
-        )
+        # Recalculate sentiment
+        blob = TextBlob(content)
+        polarity = blob.sentiment.polarity
 
-    except Error as err:
-
-        if db:
-            db.rollback()
-
-        flash(
-            f"Database error: {err}",
-            "danger"
-        )
-
-        return redirect(
-            url_for("journal_history")
-        )
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if db and db.is_connected():
-            db.close()
-
-
-# =========================================================
-# DELETE JOURNAL
-# =========================================================
-
-@app.route(
-    "/journal/<int:journal_id>/delete",
-    methods=["POST"]
-)  
-def delete_journal(journal_id):
-
-    if "student_id" not in session:
-
-        flash(
-            "Please login first.",
-            "warning"
-        )
-
-        return redirect(url_for("login"))
-
-    db = None
-    cursor = None
-
-    try:
-
-        db = get_db_connection()
-        cursor = db.cursor()
+        if polarity > 0.1:
+            sentiment = "Positive"
+        elif polarity < -0.1:
+            sentiment = "Negative"
+        else:
+            sentiment = "Neutral"
 
         cursor.execute(
             """
-            DELETE FROM journals
+            UPDATE journals
+            SET
+                title = %s,
+                content = %s,
+                sentiment = %s,
+                sentiment_score = %s
             WHERE id = %s
             AND student_id = %s
             """,
             (
+                title,
+                content,
+                sentiment,
+                polarity,
                 journal_id,
                 session["student_id"]
             )
         )
 
-        db.commit()
+        conn.commit()
 
-        if cursor.rowcount == 0:
-
-            flash(
-                "Journal entry not found.",
-                "danger"
-            )
-
-        else:
-
-            flash(
-                "Journal entry deleted successfully.",
-                "success"
-            )
-
-        return redirect(
-            url_for("journal_history")
-        )
-
-    except Error as err:
-
-        if db:
-            db.rollback()
+        cursor.close()
+        conn.close()
 
         flash(
-            f"Database error: {err}",
-            "danger"
+            "Journal updated successfully.",
+            "success"
         )
 
         return redirect(
@@ -1709,112 +1542,158 @@ def delete_journal(journal_id):
             )
         )
 
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if db and db.is_connected():
-            db.close()
-
-# =========================================================
-# AI SUPPORT - MINDMATE
-# =========================================================
-
-@app.route('/chat')
-def chat():
-
-    if 'student_id' not in session:
-        return redirect(url_for('login'))
-
-    student_email = session.get('student_email')
-
-    db = None
-    cursor = None
-    chats = []
-
-    try:
-        db = get_db_connection()
-        cursor = db.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT
-                user_message,
-                ai_reply,
-                chat_date,
-                chat_time
-            FROM ai_chats
-            WHERE student_email = %s
-            ORDER BY id ASC
-        """, (student_email,))
-
-        chats = cursor.fetchall()
-
-    except Error as err:
-
-        print("CHAT HISTORY ERROR:", err)
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if db and db.is_connected():
-            db.close()
+    cursor.close()
+    conn.close()
 
     return render_template(
-        'chat.html',
-        student_name=session.get('student_name', 'Student'),
+        "edit_journal.html",
+        journal=journal_data
+    )
+
+
+# ============================================================
+# DELETE JOURNAL
+# ============================================================
+
+@app.route(
+    "/journal/<int:journal_id>/delete",
+    methods=["POST"]
+)
+def delete_journal(journal_id):
+
+    if "student_id" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        DELETE FROM journals
+        WHERE id = %s
+        AND student_id = %s
+        """,
+        (
+            journal_id,
+            session["student_id"]
+        )
+    )
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    flash(
+        "Journal deleted successfully.",
+        "success"
+    )
+
+    return redirect(url_for("journal_history"))
+
+
+# ============================================================
+# AI SUPPORT
+# ============================================================
+
+@app.route("/chat")
+def chat():
+
+    if "student_id" not in session:
+        return redirect(url_for("login"))
+
+    student_email = session.get("student_email")
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            user_message,
+            ai_reply,
+            chat_date,
+            chat_time
+        FROM ai_chats
+        WHERE student_email = %s
+        ORDER BY created_at ASC
+        """,
+        (student_email,)
+    )
+
+    chats = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "chat.html",
         chats=chats
     )
 
 
-@app.route('/send_message', methods=['POST'])
+# ============================================================
+# SEND MESSAGE TO AI
+# ============================================================
+
+@app.route(
+    "/send_message",
+    methods=["POST"]
+)
 def send_message():
 
-    if 'student_email' not in session:
-        return redirect(url_for('login'))
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
-    student_email = session['student_email']
-    user_message = request.form.get('message', '').strip()
+    user_message = request.form.get(
+        "message",
+        ""
+    ).strip()
 
     if not user_message:
-        flash("Please enter a message.", "danger")
-        return redirect(url_for('chat'))
+        flash(
+            "Please enter a message.",
+            "danger"
+        )
+        return redirect(url_for("chat"))
 
-    ai_reply = ""
+    ai_reply = None
 
-    # -----------------------------------------------------
-    # Gemini AI Response
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # Gemini AI response
+    # --------------------------------------------------------
 
     if gemini_client:
 
         try:
 
             prompt = f"""
-You are MindMate, a friendly AI support assistant for college students.
+You are MindMate, a friendly and supportive student
+mental wellness assistant.
 
-Your role is to provide supportive, calm and practical guidance.
+Talk like a kind senior student.
 
-Rules:
-- Use simple and easy English.
-- Keep the response around 50-100 words.
-- Be warm and friendly, like a helpful senior student.
-- Do not judge the student.
-- Give practical suggestions when appropriate.
-- Encourage healthy habits such as rest, talking to trusted people,
-  taking breaks and seeking professional help when needed.
-- Do not pretend to be a doctor, therapist or counselor.
-- If the student needs professional support, gently suggest speaking
-  with a qualified counselor or trusted person.
-- Do not make a diagnosis.
-- Answer the student's actual question directly.
+Use simple English and keep the response around
+50-100 words.
 
-Student's message:
+Do not diagnose mental health conditions.
+Do not recommend medicines or medication.
+Do not pretend to be a doctor or counselor.
+
+Give practical, safe and supportive suggestions.
+
+When appropriate, remind the student about MindMate
+features such as:
+- Mood Tracker
+- Private Journal
+- Stress Relief
+- Book Recommendations
+- Inspiring Stories
+- Counselor Support
+
+Student message:
 {user_message}
-
-Reply as MindMate.
 """
 
             response = gemini_client.models.generate_content(
@@ -1824,77 +1703,61 @@ Reply as MindMate.
 
             ai_reply = response.text.strip()
 
-        except Exception as err:
+        except Exception as e:
 
-            print("GEMINI ERROR:", err)
+            print("Gemini Error:", e)
 
             ai_reply = (
-                "I'm sorry, I'm having trouble connecting right now. "
-                "Please try again in a moment."
+                "I'm having trouble responding right now. "
+                "You can try again in a moment or explore "
+                "the MindMate resources and counselor support."
             )
 
     else:
 
         ai_reply = (
-            "I'm currently unable to connect to the AI service. "
-            "Please try again later."
+            "MindMate AI is currently unavailable. "
+            "Please try again later or explore the "
+            "MindMate resources and counselor support."
         )
 
-    # -----------------------------------------------------
-    # Save Chat in Database
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # Save chat in database
+    # --------------------------------------------------------
 
-    db = None
-    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-    try:
-
-        db = get_db_connection()
-        cursor = db.cursor()
-
-        cursor.execute("""
-            INSERT INTO ai_chats
-            (
-                student_email,
-                user_message,
-                ai_reply,
-                chat_date,
-                chat_time
-            )
-            VALUES (%s, %s, %s, CURDATE(), CURTIME())
-        """, (
+    cursor.execute(
+        """
+        INSERT INTO ai_chats
+        (
             student_email,
             user_message,
-            ai_reply
-        ))
-
-        db.commit()
-
-    except Error as err:
-
-        print("AI CHAT DATABASE ERROR:", err)
-
-        if db:
-            db.rollback()
-
-        flash(
-            "Message was answered, but chat history could not be saved.",
-            "warning"
+            ai_reply,
+            chat_date,
+            chat_time
         )
+        VALUES (%s, %s, %s, CURDATE(), CURTIME())
+        """,
+        (
+            session["student_email"],
+            user_message,
+            ai_reply
+        )
+    )
 
-    finally:
+    conn.commit()
 
-        if cursor:
-            cursor.close()
+    cursor.close()
+    conn.close()
 
-        if db and db.is_connected():
-            db.close()
+    return redirect(url_for("chat"))
 
-    return redirect(url_for('chat'))
 
-# =========================================================
+# ============================================================
 # RUN APPLICATION
-# =========================================================
+# ============================================================
 
 if __name__ == "__main__":
     app.run(debug=True)

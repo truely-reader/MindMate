@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Login | MindMate</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Poppins", sans-serif;
+            background: #eef2ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+
+        .admin-login-wrapper {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .admin-login-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 38px 36px;
+            box-shadow: 0 15px 45px rgba(79, 70, 229, 0.12);
+            border: 1px solid #e5e7eb;
+        }
+
+        .brand-section {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .brand-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 14px;
+            border-radius: 18px;
+            background: #4f46e5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .brand-section h1 {
+            margin: 0;
+            color: #111827;
+            font-size: 27px;
+            font-weight: 700;
+        }
+
+        .brand-section span {
+            display: block;
+            margin-top: 4px;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .login-heading {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .login-heading h2 {
+            margin-bottom: 6px;
+            color: #1f2937;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .login-heading p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .form-label {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .form-control {
+            height: 48px;
+            border: 1px solid #d1d5db;
+            border-radius: 11px !important;
+            padding: 0 45px 0 15px;
+            font-size: 13px;
+            font-family: "Poppins", sans-serif;
+            box-shadow: none !important;
+        }
+
+        .form-control:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.10) !important;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+            z-index: 5;
+        }
+
+        .password-toggle:hover {
+            color: #4f46e5;
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 11px;
+            background: #4f46e5;
+            color: #ffffff;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .login-btn:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .security-note {
+            margin-top: 18px;
+            padding: 11px 13px;
+            border-radius: 10px;
+            background: #eef2ff;
+            color: #4b5563;
+            font-size: 11px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .security-note i {
+            color: #4f46e5;
+            margin-right: 4px;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #4f46e5;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #3730a3;
+            text-decoration: underline;
+        }
+
+        .alert {
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 500px) {
+            body {
+                padding: 15px;
+            }
+
+            .admin-login-card {
+                padding: 30px 22px;
+            }
+
+            .brand-section h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-login-wrapper">
+
+    <div class="admin-login-card">
+
+        <!-- MindMate Branding -->
+        <div class="brand-section">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+
+            <h1>MindMate</h1>
+
+            <span>Better Mind, Brighter You</span>
+
+        </div>
+
+
+        <!-- Heading -->
+        <div class="login-heading">
+
+            <h2>Admin Login</h2>
+
+            <p>
+                Secure access to MindMate Administration
+            </p>
+
+        </div>
+
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- Admin Login Form -->
+        <form
+            method="POST"
+            action="{{ url_for('admin_login') }}"
+        >
+
+            <!-- Email -->
+            <div class="mb-3">
+
+                <label
+                    for="email"
+                    class="form-label"
+                >
+                    Admin Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    placeholder="Enter admin email"
+                    required
+                    autocomplete="email"
+                >
+
+            </div>
+
+
+            <!-- Secret Key -->
+            <div class="mb-3">
+
+                <label
+                    for="secret_key"
+                    class="form-label"
+                >
+                    Admin Secret Key
+                </label>
+
+                <div class="input-group">
+
+                    <input
+                        type="password"
+                        id="secret_key"
+                        name="secret_key"
+                        class="form-control"
+                        placeholder="Enter admin secret key"
+                        required
+                        autocomplete="off"
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        onclick="togglePassword('secret_key', 'secretEye')"
+                        aria-label="Show or hide secret key"
+                    >
+                        <i
+                            class="fa-solid fa-eye"
+                            id="secretEye"
+                        ></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Password -->
+            <div class="mb-3">
+
+                <label
+                    for="password"
+                    class="form-label"
+                >
+                    Password
+                </label>
+
+                <div class="input-group">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-control"
+                        placeholder="Enter admin password"
+                        required
+                        autocomplete="current-password"
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        onclick="togglePassword('password', 'passwordEye')"
+                        aria-label="Show or hide password"
+                    >
+                        <i
+                            class="fa-solid fa-eye"
+                            id="passwordEye"
+                        ></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Login Button -->
+            <button
+                type="submit"
+                class="login-btn"
+            >
+                <i class="fa-solid fa-right-to-bracket me-2"></i>
+                Login as Admin
+            </button>
+
+        </form>
+
+
+        <!-- Security Note -->
+        <div class="security-note">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            Admin access is protected with an additional
+            secret key.
+
+        </div>
+
+
+        <!-- Back -->
+        <a
+            href="{{ url_for('home') }}"
+            class="back-link"
+        >
+            <i class="fa-solid fa-arrow-left me-1"></i>
+            Back to MindMate
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function togglePassword(inputId, iconId) {
+
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        if (input.type === "password") {
+
+            input.type = "text";
+
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+
+        } else {
+
+            input.type = "password";
+
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+
+        }
+    }
+
+</script>
+
+</body>
+</html>

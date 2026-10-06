@@ -49,6 +49,7 @@
 
 <body class="landing-page">
 
+    
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         <div class="container mt-3">
@@ -105,20 +106,33 @@
                         How It Works
                     </a>
 
-                    <a
-                        href="{{ url_for('login') }}"
-                        class="nav-login"
-                    >
-                        Login
-                    </a>
+                   <a
+    href="{{ url_for('login') }}"
+    class="nav-login"
+>
+    Student Login
+</a>
 
-                    <a
-                        href="{{ url_for('register') }}"
-                        class="nav-register"
-                    >
-                        Get Started
-                    </a>
+<a
+    href="{{ url_for('admin_login') }}"
+    class="nav-login"
+>
+    Admin Login
+</a>
 
+<a
+  href="{{ url_for('counselor') }}"
+    class="nav-login"
+>
+    Counselor Login
+</a>
+
+<a
+    href="{{ url_for('register') }}"
+    class="nav-register"
+>
+    Get Started
+</a>
                 </div>
 
             </div>
